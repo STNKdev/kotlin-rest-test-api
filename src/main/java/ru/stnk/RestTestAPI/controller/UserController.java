@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.stnk.RestTestAPI.model.Roles;
 import ru.stnk.RestTestAPI.model.User;
+import ru.stnk.RestTestAPI.model.UserCreate;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 
@@ -26,7 +27,7 @@ public class UserController {
 
     private String checkCode = "9999";
 
-    private HashMap<String, Object> payload (HashMap<String, Object> params, Integer error, String errorDesc) {
+    private HashMap<String, Object> payload (Object params, Integer error, String errorDesc) {
 
         /*//Преобразуем HashMap параметры запроса в JSON представление
         ObjectNode objectNodeData = objectMapper.valueToTree(params);
@@ -51,8 +52,8 @@ public class UserController {
     public Map<String, Object> createGetUsers (@RequestParam String email,
                                                @RequestParam String password,
                                                @RequestParam String phone,
-                                               @RequestParam(required = false, defaultValue = "web") String os) {
-        HashMap<String, Object> response = new HashMap<>();
+                                               @RequestParam(required = false, defaultValue = "web") String os,
+                                               @RequestParam(required = false, defaultValue = "ROLE_USER") String role) {
         User user = new User();
         user.setEmail(email);
         user.setPassword(password);
@@ -64,20 +65,46 @@ public class UserController {
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
         user.setRoles(new ArrayList<>());
-        user.addRole(rolesRepository.findByName("ROLE_USER"));
-        //userRepository.save(user);
-        response.put("data", user);
-        return payload(response, 0, "");
+        user.addRole(rolesRepository.findByName(role));
+        return payload(userRepository.save(user), 0, "");
     }
 
     @PostMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> createPostUser (@Valid @RequestBody User requestBody) {
+    public Map<String, Object> createPostUser (@Valid @RequestBody UserCreate requestBody) {
 
-        userRepository.save(requestBody);
+        //userRepository.save(requestBody);
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("checkCode", checkCode);
+
+        HashMap<String, Object> requestDataUser = new HashMap<>();
+        requestDataUser.put("email", requestBody.getEmail());
+        requestDataUser.put("password", requestBody.getPassword());
+        requestDataUser.put("phone", requestBody.getPhone());
+        requestDataUser.put("os", requestBody.getOs());
+
+        response.put("requestDataUser", requestDataUser);
+
+        Roles role = rolesRepository.findByName("ROLE_USER");
+
+        User user = new User();
+        user.setEmail(requestBody.getEmail());
+        user.setPassword(requestBody.getPassword());
+        user.setPhone(requestBody.getPhone());
+        user.setOs(requestBody.getOs());
+        user.setEnableUser(true);
+        user.setEmailConfirmed(false);
+        user.setBetBalance((long) 0);
+        user.setFreeBalance((long) 0);
+        user.setWithdrawalBalance((long) 0);
+        user.setRoles(new ArrayList<>());
+        user.addRole(role);
+
+        HashMap<String, Object> responseDataUser = new HashMap<>();
+        responseDataUser.put("responseDataUser", userRepository.save(user));
+
+        response.put("responseDataUser", responseDataUser);
 
         return payload(response, 0, "");
     }

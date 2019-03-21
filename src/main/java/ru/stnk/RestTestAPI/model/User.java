@@ -1,11 +1,8 @@
 package ru.stnk.RestTestAPI.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
@@ -14,25 +11,19 @@ public class User extends AuditModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private Long id;
 
     @Column(name = "email", unique = true, nullable = false)
-    @NotBlank
     private String email;
 
     @Column(name = "phone", unique = true, nullable = false)
-    @NotBlank
     private String phone;
 
     @Column(name = "password", nullable = false)
-    @NotBlank
-    @Size(min = 3)
-    @JsonIgnore
     private String password;
 
     @Column(name = "email_confirmed")
-    private boolean emailConfirmed = false;
+    private boolean emailConfirmed;
 
     @Column(name = "os")
     private String os;
@@ -46,6 +37,9 @@ public class User extends AuditModel {
     @Column(name = "withdrawal_balance")
     private long withdrawalBalance;
 
+    @Column(name = "enable_user")
+    private boolean enableUser;
+
     @ManyToMany
     @JoinTable(name="user_roles",
             joinColumns = {@JoinColumn(name="user_id", referencedColumnName="id"),
@@ -53,11 +47,7 @@ public class User extends AuditModel {
             inverseJoinColumns = {@JoinColumn(name="role_id", referencedColumnName="id"),
                     @JoinColumn(name="role_name", referencedColumnName="name")}
     )
-    @JsonIgnore
     private List<Roles> roles;
-
-    @Column(name = "enable_user")
-    private boolean enableUser;
 
     public String getEmail() {
         return email;
@@ -80,8 +70,7 @@ public class User extends AuditModel {
     }
 
     public void setPassword (String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
     }
 
     public boolean getEmailConfirmed() {
