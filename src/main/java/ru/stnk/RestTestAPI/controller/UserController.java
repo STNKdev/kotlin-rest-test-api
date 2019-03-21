@@ -86,7 +86,7 @@ public class UserController {
 
         response.put("requestDataUser", requestDataUser);
 
-        Roles role = rolesRepository.findByName("ROLE_USER");
+        //Roles role = rolesRepository.findByName("ROLE_USER");
 
         User user = new User();
         user.setEmail(requestBody.getEmail());
@@ -99,12 +99,14 @@ public class UserController {
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
         user.setRoles(new ArrayList<>());
-        user.addRole(role);
+        //user.addRole(role);
 
-        HashMap<String, Object> responseDataUser = new HashMap<>();
-        responseDataUser.put("responseDataUser", userRepository.save(user));
+        //User createUser = userRepository.save(user);
 
-        response.put("responseDataUser", responseDataUser);
+        /*HashMap<String, Object> responseDataUser = new HashMap<>();
+        responseDataUser.put("responseDataUser", createUser);
+
+        response.put("responseDataUser", responseDataUser);*/
 
         return payload(response, 0, "");
     }
