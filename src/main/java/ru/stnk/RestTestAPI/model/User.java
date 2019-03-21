@@ -17,11 +17,11 @@ public class User extends AuditModel {
     @JsonIgnore
     private Long id;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     @NotBlank
     private String email;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", unique = true, nullable = false)
     @NotBlank
     private String phone;
 
@@ -48,8 +48,10 @@ public class User extends AuditModel {
 
     @ManyToMany
     @JoinTable(name="user_roles",
-            joinColumns = @JoinColumn(name="user_id", referencedColumnName="id"),
-            inverseJoinColumns = @JoinColumn(name="roles_id", referencedColumnName="id")
+            joinColumns = {@JoinColumn(name="user_id", referencedColumnName="id"),
+                            @JoinColumn(name="user_email", referencedColumnName="email")},
+            inverseJoinColumns = {@JoinColumn(name="role_id", referencedColumnName="id"),
+                    @JoinColumn(name="role_name", referencedColumnName="name")}
     )
     @JsonIgnore
     private List<Roles> roles;

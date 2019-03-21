@@ -14,8 +14,8 @@ public class Roles {
     @Column(name = "Id", nullable = false)
     private Long id;
 
-    @Column(name = "role")
-    private String role;
+    @Column(name = "name", unique = true, nullable = false)
+    private String name;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
     @JsonIgnore
@@ -37,12 +37,12 @@ public class Roles {
         this.users = user;
     }
 
-    public String getRole() {
-        return role;
+    public String getName() {
+        return name;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole(String name) {
+        this.name = name;
     }
 
 }
