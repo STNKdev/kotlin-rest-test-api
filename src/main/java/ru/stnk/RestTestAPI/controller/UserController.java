@@ -86,7 +86,7 @@ public class UserController {
 
         response.put("requestDataUser", requestDataUser);
 
-        //Roles role = rolesRepository.findByName("ROLE_USER");
+        Roles role = rolesRepository.findByName("ROLE_USER");
 
         User user = new User();
         user.setEmail(requestBody.getEmail());
@@ -99,7 +99,7 @@ public class UserController {
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
         user.setRoles(new ArrayList<>());
-        //user.addRole(role);
+        user.addRole(role);
 
         //User createUser = userRepository.save(user);
 
