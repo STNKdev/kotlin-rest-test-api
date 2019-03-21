@@ -139,4 +139,8 @@ public class User extends AuditModel {
     public void setRoles (List<Roles> roles) {
         this.roles = roles;
     }
+
+    public void addRole (Roles name) {
+        roles.add(name);
+    }
 }

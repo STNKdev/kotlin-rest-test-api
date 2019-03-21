@@ -45,4 +45,8 @@ public class Roles {
         this.name = name;
     }
 
+    public void addUser(User user) {
+        users.add(user);
+    }
+
 }
