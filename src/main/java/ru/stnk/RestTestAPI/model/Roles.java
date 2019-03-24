@@ -8,10 +8,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "roles")
-public class Roles {
+public class Roles implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "Id", nullable = false)
     private Long id;
 

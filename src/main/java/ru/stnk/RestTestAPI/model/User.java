@@ -1,16 +1,19 @@
 package ru.stnk.RestTestAPI.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User extends AuditModel {
+public class User extends AuditModel implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
     @Column(name = "email", unique = true, nullable = false)
@@ -49,6 +52,11 @@ public class User extends AuditModel {
     )
     private List<Roles> roles;
 
+    private String passwordEncoder (String password) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.encode(password);
+    }
+
     public String getEmail() {
         return email;
     }
@@ -70,7 +78,7 @@ public class User extends AuditModel {
     }
 
     public void setPassword (String password) {
-        this.password = password;
+        this.password = passwordEncoder(password);
     }
 
     public boolean getEmailConfirmed() {

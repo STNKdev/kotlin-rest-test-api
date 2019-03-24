@@ -1,21 +1,21 @@
 package ru.stnk.RestTestAPI.model;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 public class UserCreate {
 
+    @Email
     @NotBlank
     private String email;
 
     @NotBlank
-    private String phone;
-
-    @NotBlank
     @Size(min = 3)
     private String password;
+
+    @NotBlank
+    private String phone;
 
     private boolean emailConfirmed;
 
@@ -35,7 +35,7 @@ public class UserCreate {
     public UserCreate(String email, String phone, String password, String os) {
         this.email = email;
         this.phone = phone;
-        this.password = passwordEncoder(password);
+        this.password = password;
         this.os = os;
         this.emailConfirmed = false;
         this.freeBalance = 0;
@@ -65,7 +65,7 @@ public class UserCreate {
     }
 
     public void setPassword(String password) {
-        this.password = passwordEncoder(password);
+        this.password = password;
     }
 
     public boolean isEmailConfirmed() {
@@ -116,8 +116,4 @@ public class UserCreate {
         this.enableUser = enableUser;
     }
 
-    private String passwordEncoder (String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.encode(password);
-    }
 }

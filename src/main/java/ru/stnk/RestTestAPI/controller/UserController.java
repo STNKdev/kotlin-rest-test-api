@@ -65,26 +65,21 @@ public class UserController {
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
         user.setRoles(new ArrayList<>());
-        user.addRole(rolesRepository.findByName(role));
-        return payload(userRepository.save(user), 0, "");
+
+        Roles roleName = rolesRepository.findByName(role);
+
+        user.addRole(roleName);
+        userRepository.save(user);
+        return payload(user, 0, "");
     }
 
     @PostMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> createPostUser (@Valid @RequestBody UserCreate requestBody) {
-
-        //userRepository.save(requestBody);
+    public Map<String, Object> createPostUser (@Valid @RequestBody final UserCreate requestBody) {
 
         HashMap<String, Object> response = new HashMap<>();
         response.put("checkCode", checkCode);
-
-        HashMap<String, Object> requestDataUser = new HashMap<>();
-        requestDataUser.put("email", requestBody.getEmail());
-        requestDataUser.put("password", requestBody.getPassword());
-        requestDataUser.put("phone", requestBody.getPhone());
-        requestDataUser.put("os", requestBody.getOs());
-
-        response.put("requestDataUser", requestDataUser);
+        response.put("requestDataUser", requestBody);
 
         Roles role = rolesRepository.findByName("ROLE_USER");
 
@@ -93,7 +88,7 @@ public class UserController {
         user.setPassword(requestBody.getPassword());
         user.setPhone(requestBody.getPhone());
         user.setOs(requestBody.getOs());
-        user.setEnableUser(true);
+        user.setEnableUser(false);
         user.setEmailConfirmed(false);
         user.setBetBalance((long) 0);
         user.setFreeBalance((long) 0);
@@ -101,12 +96,7 @@ public class UserController {
         user.setRoles(new ArrayList<>());
         user.addRole(role);
 
-        //User createUser = userRepository.save(user);
-
-        /*HashMap<String, Object> responseDataUser = new HashMap<>();
-        responseDataUser.put("responseDataUser", createUser);
-
-        response.put("responseDataUser", responseDataUser);*/
+        userRepository.save(user);
 
         return payload(response, 0, "");
     }
