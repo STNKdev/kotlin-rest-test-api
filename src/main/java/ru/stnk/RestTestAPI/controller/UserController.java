@@ -47,6 +47,11 @@ public class UserController {
 
     }
 
+    /*@GetMapping("/userinfo")
+    public User infoUser () {
+        return userRepository.findByEmail();
+    }*/
+
     @GetMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> createGetUsers (@RequestParam String email,
