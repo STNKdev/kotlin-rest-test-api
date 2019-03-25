@@ -48,21 +48,21 @@ public class UserController {
     }
 
     /*@GetMapping("/userinfo")
-    public User infoUser () {
-        return userRepository.findByEmail();
+    public String infoUser () {
+        return ;
     }*/
 
     @GetMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> createGetUsers (@RequestParam String email,
-                                               @RequestParam String password,
-                                               @RequestParam String phone,
+    public Map<String, Object> createGetUsers (@RequestParam @Valid UserCreate email,
+                                               @RequestParam @Valid UserCreate password,
+                                               @RequestParam @Valid UserCreate phone,
                                                @RequestParam(required = false, defaultValue = "web") String os,
                                                @RequestParam(required = false, defaultValue = "ROLE_USER") String role) {
         User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setPhone(phone);
+        user.setEmail(email.getEmail());
+        user.setPassword(password.getPassword());
+        user.setPhone(phone.getPhone());
         user.setOs(os);
         user.setEnableUser(true);
         user.setEmailConfirmed(false);
@@ -71,10 +71,10 @@ public class UserController {
         user.setWithdrawalBalance((long) 0);
         user.setRoles(new ArrayList<>());
 
-        Roles roleName = rolesRepository.findByName(role);
+        /*Roles roleName = rolesRepository.findByName(role);
 
         user.addRole(roleName);
-        userRepository.save(user);
+        userRepository.save(user);*/
         return payload(user, 0, "");
     }
 

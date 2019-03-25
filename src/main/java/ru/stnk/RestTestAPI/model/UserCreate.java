@@ -11,7 +11,7 @@ public class UserCreate {
     private String email;
 
     @NotBlank
-    @Size(min = 3)
+    @Size(min = 6)
     private String password;
 
     @NotBlank
