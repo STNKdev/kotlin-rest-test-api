@@ -13,8 +13,7 @@ import java.util.List;
 public class User extends AuditModel implements Serializable {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
 
     @Column(name = "email", unique = true, nullable = false)
     private String email;

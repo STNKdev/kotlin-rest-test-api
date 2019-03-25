@@ -11,7 +11,7 @@ import java.util.List;
 public class Roles implements Serializable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Id", nullable = false)
     private Long id;
 

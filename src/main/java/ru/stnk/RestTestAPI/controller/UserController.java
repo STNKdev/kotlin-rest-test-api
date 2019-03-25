@@ -10,6 +10,7 @@ import ru.stnk.RestTestAPI.model.UserCreate;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.*;
 
@@ -106,12 +107,19 @@ public class UserController {
         return payload(response, 0, "");
     }
 
-    /*@GetMapping("/hello")
+    @GetMapping("/hello")
     public HashMap<String, Object> getHello (@RequestParam HashMap<String, String> params) {
         HashMap<String, Object> response = new HashMap<>();
         response.put("data", params);
         response.put("time", new Date());
+        //response.put("user", userRepository.findByEmail(params.get("email")));
         response.put("user", userRepository.findByEmail(params.get("email")));
         return payload(response, 0, "");
-    }*/
+    }
+
+    @PostMapping("/invalidate")
+    public String destroySession(HttpServletRequest request) {
+        request.getSession().invalidate();
+        return "redirect:/hello";
+    }
 }
