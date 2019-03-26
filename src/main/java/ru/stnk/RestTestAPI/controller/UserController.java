@@ -1,6 +1,5 @@
 package ru.stnk.RestTestAPI.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -55,27 +54,28 @@ public class UserController {
 
     @GetMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> createGetUsers (@RequestParam @Valid UserCreate email,
-                                               @RequestParam @Valid UserCreate password,
-                                               @RequestParam @Valid UserCreate phone,
+    public Map<String, Object> createGetUsers (@RequestParam String email,
+                                               @RequestParam String password,
+                                               @RequestParam String phone,
                                                @RequestParam(required = false, defaultValue = "web") String os,
                                                @RequestParam(required = false, defaultValue = "ROLE_USER") String role) {
         User user = new User();
-        user.setEmail(email.getEmail());
-        user.setPassword(password.getPassword());
-        user.setPhone(phone.getPhone());
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setPhone(phone);
         user.setOs(os);
         user.setEnableUser(true);
         user.setEmailConfirmed(false);
         user.setBetBalance((long) 0);
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
-        user.setRoles(new ArrayList<>());
+        //user.setRoles(new ArrayList<>());
 
         Roles roleName = rolesRepository.findByName(role);
-
         user.addRole(roleName);
+
         userRepository.save(user);
+
         return payload(user, 0, "");
     }
 
@@ -87,7 +87,7 @@ public class UserController {
         response.put("checkCode", checkCode);
         response.put("requestDataUser", requestBody);
 
-        Roles role = rolesRepository.findByName("ROLE_USER");
+        Roles roleName = rolesRepository.findByName("ROLE_USER");
 
         User user = new User();
         user.setEmail(requestBody.getEmail());
@@ -99,8 +99,8 @@ public class UserController {
         user.setBetBalance((long) 0);
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
-        user.setRoles(new ArrayList<>());
-        user.addRole(role);
+        //user.setRoles(new ArrayList<>());
+        user.addRole(roleName);
 
         userRepository.save(user);
 
@@ -114,11 +114,15 @@ public class UserController {
         response.put("time", new Date());
         //response.put("user", userRepository.findByEmail(params.get("email")));
         response.put("user", userRepository.findByEmail(params.get("email")));
+
+
+
         return payload(response, 0, "");
     }
 
     @PostMapping("/logout")
     public String destroySession(HttpServletRequest request) {
+
         request.getSession().invalidate();
         return "redirect:/hello";
     }

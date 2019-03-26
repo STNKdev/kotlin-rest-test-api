@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.stnk.RestTestAPI.model.Roles;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 
+import java.util.List;
+
 @RestController
 public class RolesController {
 
@@ -17,9 +19,23 @@ public class RolesController {
 
     @GetMapping("/add-role")
     @ResponseStatus(HttpStatus.CREATED)
-    public Roles createRole (@RequestParam String name) {
-        Roles role = new Roles();
-        role.setRole(name);
-        return rolesRepository.save(role);
+    public String createRole (@RequestParam(required = false) String name) {
+        if (name == null) {
+
+            List<Roles> roles = rolesRepository.findAll();
+
+            if (roles.isEmpty()) {
+                Roles roleAdmin = new Roles();
+                roleAdmin.setName("ROLE_ADMIN");
+                rolesRepository.save(roleAdmin);
+
+                Roles roleUser = new Roles();
+                roleUser.setName("ROLE_USER");
+                rolesRepository.save(roleUser);
+            }
+        } else {
+            rolesRepository.save(new Roles(name));
+        }
+        return "CREATED";
     }
 }

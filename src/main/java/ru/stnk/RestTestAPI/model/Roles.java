@@ -22,6 +22,12 @@ public class Roles implements Serializable {
     @JsonIgnore
     private List<User> users;
 
+    public Roles(){}
+
+    public Roles (String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
@@ -42,7 +48,7 @@ public class Roles implements Serializable {
         return name;
     }
 
-    public void setRole(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 

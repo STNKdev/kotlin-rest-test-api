@@ -1,7 +1,6 @@
 package ru.stnk.RestTestAPI.model;
 
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
@@ -14,6 +13,8 @@ public class User extends AuditModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "Id", nullable = false)
+    private Long id;
 
     @Column(name = "email", unique = true, nullable = false)
     private String email;
@@ -49,6 +50,7 @@ public class User extends AuditModel implements Serializable {
             inverseJoinColumns = {@JoinColumn(name="role_id", referencedColumnName="id"),
                     @JoinColumn(name="role_name", referencedColumnName="name")}
     )
+    @JsonIgnore
     private List<Roles> roles;
 
     private String passwordEncoder (String password) {
