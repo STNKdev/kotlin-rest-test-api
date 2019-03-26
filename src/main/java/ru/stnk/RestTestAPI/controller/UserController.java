@@ -72,10 +72,10 @@ public class UserController {
         user.setWithdrawalBalance((long) 0);
         user.setRoles(new ArrayList<>());
 
-        /*Roles roleName = rolesRepository.findByName(role);
+        Roles roleName = rolesRepository.findByName(role);
 
         user.addRole(roleName);
-        userRepository.save(user);*/
+        userRepository.save(user);
         return payload(user, 0, "");
     }
 
@@ -117,7 +117,7 @@ public class UserController {
         return payload(response, 0, "");
     }
 
-    @PostMapping("/invalidate")
+    @PostMapping("/logout")
     public String destroySession(HttpServletRequest request) {
         request.getSession().invalidate();
         return "redirect:/hello";
