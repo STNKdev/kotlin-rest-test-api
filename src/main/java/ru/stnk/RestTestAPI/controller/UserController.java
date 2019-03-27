@@ -11,6 +11,7 @@ import ru.stnk.RestTestAPI.repository.UserRepository;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.*;
 
 @RestController
@@ -108,14 +109,16 @@ public class UserController {
     }
 
     @GetMapping("/hello")
-    public HashMap<String, Object> getHello (@RequestParam HashMap<String, String> params) {
+    public HashMap<String, Object> getHello (@RequestParam HashMap<String, String> params, HttpServletRequest request) {
         HashMap<String, Object> response = new HashMap<>();
         response.put("data", params);
         response.put("time", new Date());
         //response.put("user", userRepository.findByEmail(params.get("email")));
-        response.put("user", userRepository.findByEmail(params.get("email")));
+        //response.put("user", userRepository.findByEmail(params.get("email")));
 
+        Principal principal = request.getUserPrincipal();
 
+        response.put("user", principal.getName());
 
         return payload(response, 0, "");
     }

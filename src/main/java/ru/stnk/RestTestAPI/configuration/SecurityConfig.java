@@ -41,6 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/add-role").permitAll()
                 .antMatchers(HttpMethod.GET, "/hello").authenticated()
                 .antMatchers("/logout").authenticated()
+                .anyRequest().authenticated()
                 .and()
                 .csrf()
                 .disable()
