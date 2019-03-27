@@ -120,10 +120,10 @@ public class UserController {
         return payload(response, 0, "");
     }
 
-    @PostMapping("/logout")
+    /*@PostMapping("/logout")
     public String destroySession(HttpServletRequest request) {
 
         request.getSession().invalidate();
         return "redirect:/hello";
-    }
+    }*/
 }
