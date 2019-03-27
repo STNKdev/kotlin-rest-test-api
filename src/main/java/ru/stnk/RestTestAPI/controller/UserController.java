@@ -2,7 +2,9 @@ package ru.stnk.RestTestAPI.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
 import ru.stnk.RestTestAPI.model.Roles;
 import ru.stnk.RestTestAPI.model.User;
 import ru.stnk.RestTestAPI.model.UserCreate;
@@ -26,8 +28,6 @@ public class UserController {
     @Autowired
     private RolesRepository rolesRepository;
 
-    private String checkCode = "9999";
-
     private HashMap<String, Object> payload (Object params, Integer error, String errorDesc) {
 
         /*//Преобразуем HashMap параметры запроса в JSON представление
@@ -48,12 +48,7 @@ public class UserController {
 
     }
 
-    /*@GetMapping("/userinfo")
-    public String infoUser () {
-        return ;
-    }*/
-
-    @GetMapping("/reg-start")
+    /*@GetMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> createGetUsers (@RequestParam String email,
                                                @RequestParam String password,
@@ -78,17 +73,25 @@ public class UserController {
         userRepository.save(user);
 
         return payload(user, 0, "");
-    }
+    }*/
 
     @PostMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> createPostUser (@Valid @RequestBody final UserCreate requestBody) {
+    //(@Valid @RequestBody final UserCreate requestBody, BindingResult bindingResult)
+    public Map<String, Object> createPostUser (@Valid final UserCreate requestBody, BindingResult bindingResult) {
+
+        final String checkCode = "9999";
+        final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
 
         HashMap<String, Object> response = new HashMap<>();
+
+        if (bindingResult.hasErrors()) {
+            response.put("errors", bindingResult.getFieldError());
+            return response;
+        }
+
         response.put("checkCode", checkCode);
         response.put("requestDataUser", requestBody);
-
-        Roles roleName = rolesRepository.findByName("ROLE_USER");
 
         User user = new User();
         user.setEmail(requestBody.getEmail());
@@ -101,7 +104,7 @@ public class UserController {
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
         //user.setRoles(new ArrayList<>());
-        user.addRole(roleName);
+        user.addRole(roleNameDefault);
 
         userRepository.save(user);
 
