@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.sql.DataSource;
@@ -40,9 +41,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/reg-start").permitAll()
                 .antMatchers(HttpMethod.GET, "/add-role").permitAll()
                 .antMatchers(HttpMethod.GET, "/hello").authenticated()
+                .antMatchers("/logout").authenticated()
                 .and()
-                .csrf().disable()
-                .formLogin().disable();
+                .csrf()
+                .disable()
+                .formLogin()
+                .disable();
 
     }
 }
