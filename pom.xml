@@ -24,10 +24,10 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-jdbc</artifactId>
-		</dependency>
+		</dependency>-->
 
 		<!-- jpa, crud repository -->
 		<dependency>

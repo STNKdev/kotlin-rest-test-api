@@ -1,19 +1,22 @@
 package ru.stnk.RestTestAPI.controller;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.context.request.WebRequest;
 import ru.stnk.RestTestAPI.model.Roles;
 import ru.stnk.RestTestAPI.model.User;
-import ru.stnk.RestTestAPI.model.UserCreate;
+import ru.stnk.RestTestAPI.model.UserDTO;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.*;
 
 @RestController
@@ -28,7 +31,7 @@ public class UserController {
     @Autowired
     private RolesRepository rolesRepository;
 
-    private HashMap<String, Object> payload (Object params, Integer error, String errorDesc) {
+    private Map<String, Object> payload (Object params, Integer error, String errorDesc) {
 
         /*//Преобразуем HashMap параметры запроса в JSON представление
         ObjectNode objectNodeData = objectMapper.valueToTree(params);
@@ -75,10 +78,16 @@ public class UserController {
         return payload(user, 0, "");
     }*/
 
+    /*@GetMapping("/reg-start")
+    public Map<String, Object> createGetUsers (WebRequest request) {
+        Map<String, String[]> requestParams =  request.getParameterMap();
+        requestParams;
+    }*/
+
     @PostMapping("/reg-start")
     @ResponseStatus(HttpStatus.CREATED)
-    //(@Valid @RequestBody final UserCreate requestBody, BindingResult bindingResult)
-    public Map<String, Object> createPostUser (@Valid final UserCreate requestBody, BindingResult bindingResult) {
+    //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
+    public Map<String, Object> createPostUser (@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
 
         final String checkCode = "9999";
         final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
@@ -86,18 +95,20 @@ public class UserController {
         HashMap<String, Object> response = new HashMap<>();
 
         if (bindingResult.hasErrors()) {
-            response.put("errors", bindingResult.getFieldError());
+            FieldError errors = bindingResult.getFieldError();
+            response.put("requestDataUser", userDTO);
+            response.put("errors", "Поле " + "'" + errors.getField() + "'" + " " + errors.getDefaultMessage());
             return response;
         }
 
         response.put("checkCode", checkCode);
-        response.put("requestDataUser", requestBody);
+        response.put("requestDataUser", userDTO);
 
-        User user = new User();
-        user.setEmail(requestBody.getEmail());
-        user.setPassword(requestBody.getPassword());
-        user.setPhone(requestBody.getPhone());
-        user.setOs(requestBody.getOs());
+        /*User user = new User();
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+        user.setPhone(userDTO.getPhone());
+        user.setOs(userDTO.getOs());
         user.setEnableUser(false);
         user.setEmailConfirmed(false);
         user.setBetBalance((long) 0);
@@ -106,22 +117,24 @@ public class UserController {
         //user.setRoles(new ArrayList<>());
         user.addRole(roleNameDefault);
 
-        userRepository.save(user);
+        userRepository.save(user);*/
 
         return payload(response, 0, "");
     }
 
     @GetMapping("/hello")
-    public HashMap<String, Object> getHello (@RequestParam HashMap<String, String> params, HttpServletRequest request) {
+    public Map<String, Object> getHello (@RequestParam HashMap<String, String> params, WebRequest request) {
         HashMap<String, Object> response = new HashMap<>();
         response.put("data", params);
         response.put("time", new Date());
         //response.put("user", userRepository.findByEmail(params.get("email")));
         //response.put("user", userRepository.findByEmail(params.get("email")));
 
-        Principal principal = request.getUserPrincipal();
+        //Principal principal = request.getUserPrincipal();
 
-        response.put("user", principal.getName());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        response.put("user", auth.getDetails());
 
         return payload(response, 0, "");
     }
@@ -132,4 +145,8 @@ public class UserController {
         request.getSession().invalidate();
         return "redirect:/hello";
     }*/
+
+    private BindingResult checkFieldRegistrationUser (@Valid final UserDTO user, BindingResult bindingResult) {
+        return bindingResult;
+    }
 }
