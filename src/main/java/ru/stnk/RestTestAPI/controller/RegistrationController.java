@@ -14,8 +14,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+@RestController
 public class RegistrationController {
 
     @Autowired
@@ -34,10 +37,13 @@ public class RegistrationController {
             @RequestParam @NotBlank String password,
             @RequestParam @NotBlank @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$") String phone,
             @RequestParam(required = false, defaultValue = "web") String os,
-            @RequestParam(required = false, defaultValue = "ROLE_USER") String role
+            @RequestParam(required = false, defaultValue = "ROLE_USER") String roles[]
     ) {
         final String checkCode = "9999";
-        final Roles roleNameDefault = rolesRepository.findByName(role);
+        List<Roles> roleNameDefault = new ArrayList<>();
+        for (String role : roles) {
+            roleNameDefault.add(rolesRepository.findByName(role));
+        }
 
         HashMap<String, Object> data = new HashMap<>();
 
