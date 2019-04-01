@@ -1,4 +1,4 @@
-package ru.stnk.RestTestAPI.model;
+package ru.stnk.RestTestAPI.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

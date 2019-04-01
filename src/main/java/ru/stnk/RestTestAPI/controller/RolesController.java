@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import ru.stnk.RestTestAPI.model.Roles;
+import ru.stnk.RestTestAPI.entity.Roles;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 
 import java.util.List;

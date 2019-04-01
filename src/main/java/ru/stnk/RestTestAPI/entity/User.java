@@ -1,4 +1,4 @@
-package ru.stnk.RestTestAPI.model;
+package ru.stnk.RestTestAPI.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

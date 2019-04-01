@@ -1,4 +1,4 @@
-package ru.stnk.RestTestAPI.model;
+package ru.stnk.RestTestAPI.controller;
 
 public class RestResponse {
 
@@ -7,6 +7,17 @@ public class RestResponse {
     private String description = "";
 
     public RestResponse() {}
+
+    public RestResponse(int error, String description) {
+        this.error = error;
+        this.description = description;
+    }
+
+    public RestResponse(Object data, int error, String description) {
+        this.data = data;
+        this.error = error;
+        this.description = description;
+    }
 
     public Object getData() {
         return data;
