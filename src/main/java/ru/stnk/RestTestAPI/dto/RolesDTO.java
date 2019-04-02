@@ -1,16 +1,21 @@
 package ru.stnk.RestTestAPI.dto;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import ru.stnk.RestTestAPI.repository.RolesRepository;
+public class RolesDTO {
 
-public class RolesDTO implements GrantedAuthority {
+    private String nameRole;
 
-    /*@Autowired
-    RolesRepository rolesRepository;*/
+    public RolesDTO() {
+    }
 
-    @Override
-    public String getAuthority() {
-        return null;
+    public RolesDTO(String nameRole) {
+        this.nameRole = nameRole;
+    }
+
+    public String getNameRole() {
+        return nameRole;
+    }
+
+    public void setNameRole(String nameRole) {
+        this.nameRole = nameRole;
     }
 }
