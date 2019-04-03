@@ -1,18 +1,13 @@
 package ru.stnk.RestTestAPI.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
-import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
 
 import javax.sql.DataSource;
 
@@ -27,8 +22,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
         auth.jdbcAuthentication().dataSource(dataSource)
+                //проверка существования пользователя и его состояние enable_user
                 .usersByUsernameQuery("select email,password,enable_user from users where email=?")
+                //запрос роли пользователя
                 .authoritiesByUsernameQuery("select user_email,role_name from user_roles where user_email=?")
+                //нужно для проверки пароля
                 .passwordEncoder(new BCryptPasswordEncoder());
 
     }

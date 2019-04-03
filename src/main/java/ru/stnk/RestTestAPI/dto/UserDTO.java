@@ -7,16 +7,17 @@ import javax.validation.constraints.Size;
 
 public class UserDTO {
 
-    @Email
+    @Email(message = "Некорректный email")
     @NotBlank
     private String email;
 
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 3, message = "Длина пароля должна быть не меньше трёх")
     private String password;
 
     @NotBlank
-    @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$")
+    @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$",
+            message = "Некорректный формат номера телефона")
     private String phone;
 
     @NotBlank

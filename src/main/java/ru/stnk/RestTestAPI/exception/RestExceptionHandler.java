@@ -1,6 +1,6 @@
 package ru.stnk.RestTestAPI.exception;
 
-import java.util.Arrays;
+/*import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,14 +17,14 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;*/
 
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice()
-public class RestExceptionHandler extends ResponseEntityExceptionHandler{
+/*@Order(Ordered.HIGHEST_PRECEDENCE)
+@ControllerAdvice()*/
+public class RestExceptionHandler /*extends ResponseEntityExceptionHandler*/{
 
-    @Override
+    /*@Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, HttpHeaders headers,
                                                                           HttpStatus status, WebRequest request) {
         String error = ex.getParameterName() + " параметр отсутствует.";
@@ -39,5 +39,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler{
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorResponse<>(Arrays.asList(ex.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    }*/
 }

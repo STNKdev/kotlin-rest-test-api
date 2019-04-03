@@ -1,22 +1,19 @@
 package ru.stnk.RestTestAPI.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import ru.stnk.RestTestAPI.entity.Roles;
 import ru.stnk.RestTestAPI.dto.UserDTO;
+import ru.stnk.RestTestAPI.entity.Roles;
+import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
+import javax.validation.*;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @RestController
 public class RegistrationController {
@@ -29,23 +26,75 @@ public class RegistrationController {
 
     //Поля по умолчанию: Object data = null, int error = 0, String description = ""
     //data может быть HashMap
-    private RestResponse response = new RestResponse();
+    //private RestResponse response = new RestResponse();
 
     @GetMapping("/reg-start")
     public RestResponse getCreateUsers (
-            @RequestParam @Email @NotBlank String email,
-            @RequestParam @NotBlank String password,
-            @RequestParam @NotBlank @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$") String phone,
-            @RequestParam(required = false, defaultValue = "web") String os,
-            @RequestParam(required = false, defaultValue = "ROLE_USER") String roles[]
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String phone,
+            @RequestParam String os
     ) {
         final String checkCode = "9999";
-        List<Roles> roleNameDefault = new ArrayList<>();
-        for (String role : roles) {
-            roleNameDefault.add(rolesRepository.findByName(role));
-        }
+        final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
+        RestResponse response = new RestResponse();
 
         HashMap<String, Object> data = new HashMap<>();
+
+        Optional<User> usr = userRepository.findByEmail(email);
+
+        if (usr.isPresent()) {
+            response.setError(106);
+            response.setDescription("Пользователь существует");
+            return response;
+        }
+
+        if (password.equals(email)) {
+            response.setError(108);
+            response.setDescription("Пароль не должен совпадать с логином");
+            return response;
+        }
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setEmail(email);
+        userDTO.setPassword(password);
+        userDTO.setPhone(phone);
+        userDTO.setOs(os);
+
+        /*
+        * Про Validator взял отсюда
+        * https://www.javaquery.com/2018/02/constraints-validation-for-user-inputs.html
+        *
+        * https://habr.com/ru/post/68318/
+        */
+        ValidatorFactory validationFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = validationFactory.getValidator();
+        Set<ConstraintViolation<UserDTO>> violations = validator.validate(userDTO);
+
+        /*
+        * violation.getPropertyPath().toString() - возвращает имя поля в котором возникла ошибка
+        * violation.getMessage() - возвращает сообщение об ошибке
+        * violation.getInvalidValue() - возвращает значиние из-за которого возникла ошибка
+        * */
+        if (!violations.isEmpty()) {
+            for (ConstraintViolation<UserDTO> violation : violations) {
+                data.put(violation.getPropertyPath().toString(), violation.getMessage());
+            }
+
+            if (data.containsKey("email")) {
+                response.setError(107);
+                response.setDescription(data.get("email").toString());
+                return response;
+            } else if (data.containsKey("password")) {
+                response.setError(108);
+                response.setDescription(data.get("password").toString());
+                return response;
+            } else if (data.containsKey("phone")) {
+                response.setError(111);
+                response.setDescription(data.get("phone").toString());
+                return response;
+            }
+        }
 
         data.put("checkCode", checkCode);
 
@@ -70,22 +119,44 @@ public class RegistrationController {
     }
 
     @PostMapping("/reg-start")
-    @ResponseStatus(HttpStatus.CREATED)
     //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
     public RestResponse postCreateUser (@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
 
         final String checkCode = "9999";
         final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
+        RestResponse response = new RestResponse();
 
         HashMap<String, Object> data = new HashMap<>();
+
+        Optional<User> usr = userRepository.findByEmail(userDTO.getEmail());
+
+        if (usr.isPresent()) {
+            response.setError(106);
+            response.setDescription("Пользователь существует");
+            return response;
+        }
+
+        if (userDTO.getPassword().equals(userDTO.getEmail())) {
+            response.setError(108);
+            response.setDescription("Пароль не должен совпадать с логином");
+            return response;
+        }
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
             /*response.put("requestDataUser", userDTO);
             response.put("errors", "Поле " + "'" + errors.getField() + "'" + " " + errors.getDefaultMessage());*/
 
-            response.setError(HttpStatus.EXPECTATION_FAILED.value());
-            response.setDescription("Поле " + "'" + errors.getField() + "'" + " " + errors.getDefaultMessage());
+            if (errors.getField().equals("email")) {
+                response.setError(107);
+                response.setDescription(errors.getDefaultMessage());
+            } else if (errors.getField().equals("password")) {
+                response.setError(108);
+                response.setDescription(errors.getDefaultMessage());
+            } else if (errors.getField().equals("phone")) {
+                response.setError(111);
+                response.setDescription(errors.getDefaultMessage());
+            }
 
             return response;
         }

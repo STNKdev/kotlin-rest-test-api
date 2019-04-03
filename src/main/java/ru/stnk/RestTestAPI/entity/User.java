@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User extends AuditModel {
+public class User extends AuditModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
