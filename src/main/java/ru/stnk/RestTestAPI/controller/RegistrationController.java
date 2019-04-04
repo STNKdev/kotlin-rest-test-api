@@ -25,10 +25,6 @@ public class RegistrationController {
     @Autowired
     private RolesRepository rolesRepository;
 
-    //Поля по умолчанию: Object data = null, int error = 0, String description = ""
-    //data может быть HashMap
-    //private RestResponse response = new RestResponse();
-
     @GetMapping("/reg-start")
     public RestResponse getCreateUsers (
             @RequestParam String email,

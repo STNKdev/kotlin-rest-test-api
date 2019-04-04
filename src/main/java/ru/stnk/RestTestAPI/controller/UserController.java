@@ -1,6 +1,7 @@
 package ru.stnk.RestTestAPI.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
@@ -38,7 +39,6 @@ public class UserController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         data.put("user", auth.getDetails());
-
         response.setData(data);
 
         return response;

@@ -1,5 +1,7 @@
 package ru.stnk.RestTestAPI.results;
 
+import org.springframework.http.HttpStatus;
+
 public class RestResponse<T> {
 
     private T data;
@@ -13,6 +15,7 @@ public class RestResponse<T> {
     }
 
     public RestResponse(int error, String description) {
+        this.data = null;
         this.error = error;
         this.description = description;
     }
@@ -21,6 +24,18 @@ public class RestResponse<T> {
         this.data = data;
         this.error = error;
         this.description = description;
+    }
+
+    public RestResponse(int error) {
+        this.data = null;
+        this.error = error;
+        this.description = "";
+    }
+
+    public RestResponse(int error, Throwable ex) {
+        this.data = null;
+        this.error = error;
+        this.description = ex.getMessage();
     }
 
     public T getData() {

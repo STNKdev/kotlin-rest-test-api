@@ -3,12 +3,12 @@ package ru.stnk.RestTestAPI.exception;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus
-public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
+public class ResourceException extends RuntimeException {
+    public ResourceException(String message) {
         super(message);
     }
 
-    public ResourceNotFoundException(String message, Throwable cause) {
+    public ResourceException(String message, Throwable cause) {
         super(message, cause);
     }
 }
