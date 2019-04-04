@@ -1,29 +1,33 @@
-package ru.stnk.RestTestAPI.controller;
+package ru.stnk.RestTestAPI.results;
 
-public class RestResponse {
+public class RestResponse<T> {
 
-    private Object data = null;
-    private int error = 0;
-    private String description = "";
+    private T data;
+    private int error;
+    private String description;
 
-    public RestResponse() {}
+    public RestResponse() {
+        this.data = null;
+        this.error = 0;
+        this.description = "";
+    }
 
     public RestResponse(int error, String description) {
         this.error = error;
         this.description = description;
     }
 
-    public RestResponse(Object data, int error, String description) {
+    public RestResponse(T data, int error, String description) {
         this.data = data;
         this.error = error;
         this.description = description;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
 

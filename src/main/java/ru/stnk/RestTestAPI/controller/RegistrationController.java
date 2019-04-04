@@ -9,6 +9,7 @@ import ru.stnk.RestTestAPI.entity.Roles;
 import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
+import ru.stnk.RestTestAPI.results.RestResponse;
 
 import javax.validation.*;
 import java.util.HashMap;
