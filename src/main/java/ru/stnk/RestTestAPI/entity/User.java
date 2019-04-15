@@ -43,6 +43,9 @@ public class User extends AuditModel implements Serializable {
     @Column(name = "enable_user")
     private boolean enableUser;
 
+    @Column(name = "activation_code")
+    private String activationCode;
+
     @ManyToMany
     @JoinTable(name="user_roles",
             joinColumns = {@JoinColumn(name="user_id", referencedColumnName="id"),
@@ -128,6 +131,14 @@ public class User extends AuditModel implements Serializable {
 
     public void setEnableUser (boolean enableUser) {
         this.enableUser = enableUser;
+    }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
     }
 
     public List<Roles> getRoles() {

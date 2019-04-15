@@ -10,6 +10,7 @@ import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.results.RestResponse;
+import ru.stnk.RestTestAPI.service.MailSender;
 
 import javax.validation.*;
 import java.util.HashMap;
@@ -25,6 +26,9 @@ public class RegistrationController {
     @Autowired
     private RolesRepository rolesRepository;
 
+    @Autowired
+    private MailSender mailSender;
+
     @GetMapping("/reg-start")
     public RestResponse getCreateUsers (
             @RequestParam String email,
@@ -32,7 +36,7 @@ public class RegistrationController {
             @RequestParam String phone,
             @RequestParam String os
     ) {
-        final String checkCode = "9999";
+
         final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
         RestResponse response = new RestResponse();
 
@@ -93,6 +97,12 @@ public class RegistrationController {
             }
         }
 
+        int checkCode = getRandomIntegerBetweenRange(1000, 9999);
+
+        String message = String.format("Hello! Your check code:\n %s", checkCode);
+
+        mailSender.send(email, "Activation code", message);
+
         data.put("checkCode", checkCode);
 
         response.setData(data);
@@ -107,7 +117,7 @@ public class RegistrationController {
         user.setBetBalance((long) 0);
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
-        //user.setRoles(new ArrayList<>());
+        user.setRoles(new ArrayList<>());
         user.addRole(roleName);
 
         userRepository.save(user);*/
@@ -119,7 +129,6 @@ public class RegistrationController {
     //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
     public RestResponse postCreateUser (@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
 
-        final String checkCode = "9999";
         final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
         RestResponse response = new RestResponse();
 
@@ -158,7 +167,7 @@ public class RegistrationController {
             return response;
         }
 
-        data.put("checkCode", checkCode);
+        data.put("checkCode", getRandomIntegerBetweenRange(1000, 9999));
 
         response.setData(data);
 
@@ -172,11 +181,16 @@ public class RegistrationController {
         user.setBetBalance((long) 0);
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
-        //user.setRoles(new ArrayList<>());
+        user.setRoles(new ArrayList<>());
         user.addRole(roleNameDefault);
 
         userRepository.save(user);*/
 
         return response;
+    }
+
+    private static int getRandomIntegerBetweenRange(int min, int max){
+        int x = (int) (Math.random() * ( (max - min) + 1 )) + min;
+        return x;
     }
 }

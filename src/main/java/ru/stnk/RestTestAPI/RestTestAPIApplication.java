@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import org.springframework.scheduling.annotation.EnableAsync;
 import ru.stnk.RestTestAPI.entity.Roles;
 import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 
 @SpringBootApplication
 @EnableJpaAuditing
+@EnableAsync
 public class RestTestAPIApplication {
 
 	@Bean
