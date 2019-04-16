@@ -167,7 +167,13 @@ public class RegistrationController {
             return response;
         }
 
-        data.put("checkCode", getRandomIntegerBetweenRange(1000, 9999));
+        int checkCode = getRandomIntegerBetweenRange(1000, 9999);
+
+        String message = String.format("Hello! Your check code:\n %s", checkCode);
+
+        mailSender.send(userDTO.getEmail(), "Activation code", message);
+
+        data.put("checkCode", checkCode);
 
         response.setData(data);
 
