@@ -127,7 +127,8 @@ public class RegistrationController {
 
     @PostMapping("/reg-start")
     //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
-    public RestResponse postCreateUser (@Valid @RequestBody UserDTO userDTO, BindingResult bindingResult) {
+    public RestResponse postCreateUser (@Valid @RequestBody UserDTO userDTO,
+                                        BindingResult bindingResult) {
 
         final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
         RestResponse response = new RestResponse();
