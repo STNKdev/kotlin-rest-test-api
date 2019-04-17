@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import ru.stnk.RestTestAPI.exception.registration.*;
 import ru.stnk.RestTestAPI.results.RestResponse;
 
 @ControllerAdvice
@@ -22,6 +23,41 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                                              WebRequest request) {
         RestResponse restResponse = new RestResponse (status.value(), ex.getLocalizedMessage());
         return new ResponseEntity<>(restResponse, status);
+    }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<Object> handleIncorrectLoginException (IncorrectPasswordException ex,
+                                                                 WebRequest request) {
+        RestResponse restResponse = new RestResponse (104, "Не указано/пустое поле пароля или длина меньше 3");
+        return new ResponseEntity<>(restResponse, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(UserExistException.class)
+    public ResponseEntity<Object> handleUserExistException (UserExistException ex,
+                                                                 WebRequest request) {
+        RestResponse restResponse = new RestResponse (106, "Пользователь существует");
+        return new ResponseEntity<>(restResponse, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(IncorrectEmailException.class)
+    public ResponseEntity<Object> handleIncorrectEmailException (IncorrectEmailException ex,
+                                                                 WebRequest request) {
+        RestResponse restResponse = new RestResponse (107, "Некорректный email");
+        return new ResponseEntity<>(restResponse, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(LoginPasswordEqualException.class)
+    public ResponseEntity<Object> handleIncorrectEmailException (LoginPasswordEqualException ex,
+                                                                 WebRequest request) {
+        RestResponse restResponse = new RestResponse (108, "Пароль не должен совпадать с логином");
+        return new ResponseEntity<>(restResponse, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(IncorrectPhoneException.class)
+    public ResponseEntity<Object> handleIncorrectPhoneException (IncorrectPhoneException ex,
+                                                                 WebRequest request) {
+        RestResponse restResponse = new RestResponse (111, "Некорректный номер телефона");
+        return new ResponseEntity<>(restResponse, HttpStatus.OK);
     }
 
     @Override

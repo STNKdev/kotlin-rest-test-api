@@ -5,8 +5,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.stnk.RestTestAPI.dto.UserDTO;
-import ru.stnk.RestTestAPI.entity.Roles;
-import ru.stnk.RestTestAPI.entity.User;
+import ru.stnk.RestTestAPI.entity.VerificationCode;
+import ru.stnk.RestTestAPI.exception.registration.IncorrectEmailException;
+import ru.stnk.RestTestAPI.exception.registration.IncorrectPasswordException;
+import ru.stnk.RestTestAPI.exception.registration.IncorrectPhoneException;
+import ru.stnk.RestTestAPI.exception.registration.LoginPasswordEqualException;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.results.RestResponse;
@@ -14,7 +17,6 @@ import ru.stnk.RestTestAPI.service.MailSender;
 
 import javax.validation.*;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -35,25 +37,17 @@ public class RegistrationController {
             @RequestParam String password,
             @RequestParam String phone,
             @RequestParam String os
-    ) {
+    ) throws IncorrectEmailException,
+            LoginPasswordEqualException,
+            IncorrectPasswordException,
+            IncorrectPhoneException {
 
-        final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
         RestResponse response = new RestResponse();
 
         HashMap<String, Object> data = new HashMap<>();
 
-        Optional<User> usr = userRepository.findByEmail(email);
-
-        if (usr.isPresent()) {
-            response.setError(106);
-            response.setDescription("Пользователь существует");
-            return response;
-        }
-
         if (password.equals(email)) {
-            response.setError(108);
-            response.setDescription("Пароль не должен совпадать с логином");
-            return response;
+            throw new LoginPasswordEqualException();
         }
 
         UserDTO userDTO = new UserDTO();
@@ -78,22 +72,21 @@ public class RegistrationController {
         * violation.getInvalidValue() - возвращает значиние из-за которого возникла ошибка
         * */
         if (!violations.isEmpty()) {
+
+            HashMap<String, String> errors = new HashMap<>();
             for (ConstraintViolation<UserDTO> violation : violations) {
-                data.put(violation.getPropertyPath().toString(), violation.getMessage());
+                errors.put(violation.getPropertyPath().toString(), violation.getMessage());
             }
 
-            if (data.containsKey("email")) {
-                response.setError(107);
+            if (errors.containsKey("email")) {
+                /*response.setError(107);
                 response.setDescription(data.get("email").toString());
-                return response;
-            } else if (data.containsKey("password")) {
-                response.setError(108);
-                response.setDescription(data.get("password").toString());
-                return response;
-            } else if (data.containsKey("phone")) {
-                response.setError(111);
-                response.setDescription(data.get("phone").toString());
-                return response;
+                return response;*/
+                throw new IncorrectEmailException();
+            } else if (errors.containsKey("password")) {
+                throw new IncorrectPasswordException();
+            } else if (errors.containsKey("phone")) {
+                throw new IncorrectPhoneException();
             }
         }
 
@@ -107,68 +100,41 @@ public class RegistrationController {
 
         response.setData(data);
 
-        /*User user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setPhone(phone);
-        user.setOs(os);
-        user.setEnableUser(true);
-        user.setEmailConfirmed(false);
-        user.setBetBalance((long) 0);
-        user.setFreeBalance((long) 0);
-        user.setWithdrawalBalance((long) 0);
-        user.setRoles(new ArrayList<>());
-        user.addRole(roleName);
-
-        userRepository.save(user);*/
-
         return response;
     }
 
     @PostMapping("/reg-start")
     //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
     public RestResponse postCreateUser (@Valid @RequestBody UserDTO userDTO,
-                                        BindingResult bindingResult) {
+                                        BindingResult bindingResult)
+            throws IncorrectEmailException,
+            LoginPasswordEqualException,
+            IncorrectPasswordException,
+            IncorrectPhoneException {
 
-        final Roles roleNameDefault = rolesRepository.findByName("ROLE_USER");
         RestResponse response = new RestResponse();
 
         HashMap<String, Object> data = new HashMap<>();
 
-        Optional<User> usr = userRepository.findByEmail(userDTO.getEmail());
-
-        if (usr.isPresent()) {
-            response.setError(106);
-            response.setDescription("Пользователь существует");
-            return response;
-        }
-
         if (userDTO.getPassword().equals(userDTO.getEmail())) {
-            response.setError(108);
-            response.setDescription("Пароль не должен совпадать с логином");
-            return response;
+            throw new LoginPasswordEqualException();
         }
 
         if (bindingResult.hasErrors()) {
             FieldError errors = bindingResult.getFieldError();
-            /*response.put("requestDataUser", userDTO);
-            response.put("errors", "Поле " + "'" + errors.getField() + "'" + " " + errors.getDefaultMessage());*/
 
             if (errors.getField().equals("email")) {
-                response.setError(107);
-                response.setDescription(errors.getDefaultMessage());
+                throw new IncorrectEmailException();
             } else if (errors.getField().equals("password")) {
-                response.setError(108);
-                response.setDescription(errors.getDefaultMessage());
+                throw new IncorrectPasswordException();
             } else if (errors.getField().equals("phone")) {
-                response.setError(111);
-                response.setDescription(errors.getDefaultMessage());
+                throw new IncorrectPhoneException();
             }
-
-            return response;
         }
 
         int checkCode = getRandomIntegerBetweenRange(1000, 9999);
+
+        VerificationCode verificationCode = new VerificationCode(checkCode, userDTO, 1);
 
         String message = String.format("Hello! Your check code:\n %s", checkCode);
 
@@ -177,21 +143,6 @@ public class RegistrationController {
         data.put("checkCode", checkCode);
 
         response.setData(data);
-
-        /*User user = new User();
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
-        user.setPhone(userDTO.getPhone());
-        user.setOs(userDTO.getOs());
-        user.setEnableUser(false);
-        user.setEmailConfirmed(false);
-        user.setBetBalance((long) 0);
-        user.setFreeBalance((long) 0);
-        user.setWithdrawalBalance((long) 0);
-        user.setRoles(new ArrayList<>());
-        user.addRole(roleNameDefault);
-
-        userRepository.save(user);*/
 
         return response;
     }

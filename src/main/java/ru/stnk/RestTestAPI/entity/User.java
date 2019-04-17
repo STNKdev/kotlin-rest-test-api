@@ -40,11 +40,8 @@ public class User extends AuditModel implements Serializable {
     @Column(name = "withdrawal_balance")
     private long withdrawalBalance;
 
-    @Column(name = "enable_user")
-    private boolean enableUser;
-
-    @Column(name = "activation_code")
-    private String activationCode;
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @ManyToMany
     @JoinTable(name="user_roles",
@@ -126,19 +123,11 @@ public class User extends AuditModel implements Serializable {
     }
 
     public boolean getEnableUser() {
-        return enableUser;
+        return enabled;
     }
 
-    public void setEnableUser (boolean enableUser) {
-        this.enableUser = enableUser;
-    }
-
-    public String getActivationCode() {
-        return activationCode;
-    }
-
-    public void setActivationCode(String activationCode) {
-        this.activationCode = activationCode;
+    public void setEnableUser (boolean enabled) {
+        this.enabled = enabled;
     }
 
     public List<Roles> getRoles() {
