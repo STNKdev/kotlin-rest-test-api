@@ -14,6 +14,7 @@ import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.results.RestResponse;
 import ru.stnk.RestTestAPI.service.MailSender;
+import ru.stnk.RestTestAPI.service.UserService;
 
 import javax.validation.*;
 import java.util.HashMap;
@@ -22,14 +23,17 @@ import java.util.Set;
 @RestController
 public class RegistrationController {
 
-    @Autowired
+    /*@Autowired
     private UserRepository userRepository;
 
     @Autowired
     private RolesRepository rolesRepository;
 
     @Autowired
-    private MailSender mailSender;
+    private MailSender mailSender;*/
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/reg-start")
     public RestResponse getCreateUsers (
@@ -90,13 +94,7 @@ public class RegistrationController {
             }
         }
 
-        int checkCode = getRandomIntegerBetweenRange(1000, 9999);
-
-        String message = String.format("Hello! Your check code:\n %s", checkCode);
-
-        mailSender.send(email, "Activation code", message);
-
-        data.put("checkCode", checkCode);
+        data.put("checkCode", userService.sendCheckCodeToEmail(userDTO.getEmail()));
 
         response.setData(data);
 
@@ -132,23 +130,12 @@ public class RegistrationController {
             }
         }
 
-        int checkCode = getRandomIntegerBetweenRange(1000, 9999);
+        //VerificationCode verificationCode = new VerificationCode(checkCode, userDTO, 1);
 
-        VerificationCode verificationCode = new VerificationCode(checkCode, userDTO, 1);
-
-        String message = String.format("Hello! Your check code:\n %s", checkCode);
-
-        mailSender.send(userDTO.getEmail(), "Activation code", message);
-
-        data.put("checkCode", checkCode);
+        data.put("checkCode", userService.sendCheckCodeToEmail(userDTO.getEmail()));
 
         response.setData(data);
 
         return response;
-    }
-
-    private static int getRandomIntegerBetweenRange(int min, int max){
-        int x = (int) (Math.random() * ( (max - min) + 1 )) + min;
-        return x;
     }
 }

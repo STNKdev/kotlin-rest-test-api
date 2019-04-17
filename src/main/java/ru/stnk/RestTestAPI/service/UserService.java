@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stnk.RestTestAPI.dto.UserDTO;
 import ru.stnk.RestTestAPI.entity.User;
+import ru.stnk.RestTestAPI.entity.VerificationCode;
 import ru.stnk.RestTestAPI.exception.registration.UserExistException;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
+import ru.stnk.RestTestAPI.repository.VerificationCodeRepository;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -20,6 +22,12 @@ public class UserService implements IUserService {
 
     @Autowired
     private RolesRepository rolesRepository;
+
+    @Autowired
+    private VerificationCodeRepository verificationCodeRepository;
+
+    @Autowired
+    private MailSender mailSender;
 
     @Transactional
     @Override
@@ -51,5 +59,30 @@ public class UserService implements IUserService {
             return true;
         }
         return false;
+    }
+
+    public int sendCheckCodeToEmail(String email) {
+        int checkCode = getRandomIntegerBetweenRange(1000, 9999);
+
+        String message = String.format("Hello! Your check code:\n %s", checkCode);
+
+        VerificationCode verificationCode = verificationCodeRepository.findByUserEmail(email);
+
+        if (verificationCode != null) {
+            verificationCode.setCheckCode(checkCode);
+            verificationCodeRepository.save(verificationCode);
+        } else {
+            verificationCode = new VerificationCode(checkCode, email);
+            verificationCodeRepository.save(verificationCode);
+        }
+
+        mailSender.send(email, "Activation code", message);
+
+        return checkCode;
+    }
+
+    private static int getRandomIntegerBetweenRange(int min, int max) {
+        int x = (int) (Math.random() * ( (max - min) + 1 )) + min;
+        return x;
     }
 }
