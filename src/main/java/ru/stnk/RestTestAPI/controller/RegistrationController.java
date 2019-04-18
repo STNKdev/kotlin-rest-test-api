@@ -94,7 +94,9 @@ public class RegistrationController {
             }
         }
 
-        data.put("checkCode", userService.sendCheckCodeToEmail(userDTO.getEmail()));
+        data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
+
+        userService.sendCheckCodeToEmail(userDTO.getEmail());
 
         response.setData(data);
 
@@ -103,9 +105,10 @@ public class RegistrationController {
 
     @PostMapping("/reg-start")
     //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
-    public RestResponse postCreateUser (@Valid @RequestBody UserDTO userDTO,
-                                        BindingResult bindingResult)
-            throws IncorrectEmailException,
+    public RestResponse postCreateUser (
+            @Valid @RequestBody UserDTO userDTO,
+            BindingResult bindingResult
+    ) throws IncorrectEmailException,
             LoginPasswordEqualException,
             IncorrectPasswordException,
             IncorrectPhoneException {
@@ -130,9 +133,9 @@ public class RegistrationController {
             }
         }
 
-        //VerificationCode verificationCode = new VerificationCode(checkCode, userDTO, 1);
+        data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        data.put("checkCode", userService.sendCheckCodeToEmail(userDTO.getEmail()));
+        userService.sendCheckCodeToEmail(userDTO.getEmail());
 
         response.setData(data);
 

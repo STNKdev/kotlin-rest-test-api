@@ -6,5 +6,5 @@ import ru.stnk.RestTestAPI.entity.VerificationCode;
 import java.util.Optional;
 
 public interface VerificationCodeRepository extends JpaRepository<VerificationCode, Long> {
-    VerificationCode findByUserEmail (String email);
+    Optional<VerificationCode> findByUserEmail (String email);
 }

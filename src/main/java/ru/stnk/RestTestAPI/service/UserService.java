@@ -61,26 +61,39 @@ public class UserService implements IUserService {
         return false;
     }
 
-    public int sendCheckCodeToEmail(String email) {
+    public int saveCheckCodeToEmail(String email) {
         int checkCode = getRandomIntegerBetweenRange(1000, 9999);
 
-        String message = String.format("Hello! Your check code:\n %s", checkCode);
+        Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
 
-        VerificationCode verificationCode = verificationCodeRepository.findByUserEmail(email);
-
-        if (verificationCode != null) {
+        if (verificationCodeFromDB.isPresent()) {
+            VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
             verificationCode.setCheckCode(checkCode);
             verificationCodeRepository.save(verificationCode);
         } else {
-            verificationCode = new VerificationCode(checkCode, email);
+            VerificationCode verificationCode = new VerificationCode(checkCode, email);
             verificationCodeRepository.save(verificationCode);
         }
-
-        mailSender.send(email, "Activation code", message);
 
         return checkCode;
     }
 
+    public void sendCheckCodeToEmail(String email) {
+
+        Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
+
+        if (verificationCodeFromDB.isPresent()) {
+
+            VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
+
+            String message = String.format("Hello! Your check code:\n %s", verificationCode.getCheckCode());
+
+            mailSender.send(email, "Activation code", message);
+        }
+
+    }
+
+    //Получить случайное число от min до max
     private static int getRandomIntegerBetweenRange(int min, int max) {
         int x = (int) (Math.random() * ( (max - min) + 1 )) + min;
         return x;
