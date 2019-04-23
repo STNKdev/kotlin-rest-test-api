@@ -6,12 +6,17 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.stnk.RestTestAPI.dto.UserDTO;
 import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.entity.VerificationCode;
+import ru.stnk.RestTestAPI.exception.registration.DelayException;
 import ru.stnk.RestTestAPI.exception.registration.UserExistException;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.repository.VerificationCodeRepository;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -53,6 +58,7 @@ public class UserService implements IUserService {
         return repository.save(user);
     }
 
+    //Проверка на существование пользователя с таким email
     private boolean emailExists(String email) {
         Optional<User> user = repository.findByEmail(email);
         if (user.isPresent()) {
@@ -61,35 +67,51 @@ public class UserService implements IUserService {
         return false;
     }
 
-    public int saveCheckCodeToEmail(String email) {
+    public Map<String, Object> saveCheckCodeToEmail(String email) throws DelayException {
         int checkCode = getRandomIntegerBetweenRange(1000, 9999);
 
         Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
+        VerificationCode verificationCode;
+        Map<String, Object> data = new HashMap<>();
 
         if (verificationCodeFromDB.isPresent()) {
-            VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
-            verificationCode.setCheckCode(checkCode);
-            verificationCodeRepository.save(verificationCode);
+            Instant requestTime = Instant.now();
+            verificationCode = (VerificationCode) verificationCodeFromDB.get();
+
+            Duration timeDifferenceDelay = Duration.between(verificationCode.getDelayDate(), requestTime);
+            Duration timeDifferenceExpiry = Duration.between(verificationCode.getCreateDate(), requestTime);
+
+            if (timeDifferenceDelay.getSeconds() <= verificationCode.DELAY_TIME) {
+                throw new DelayException();
+            } else {
+                sendCheckCodeToEmail(email, verificationCode.getCheckCode());
+                verificationCode.setDelayDate(Instant.now());
+                verificationCodeRepository.save(verificationCode);
+                data.put("secondsUntilExpired", verificationCode.EXPIRY_TIME - timeDifferenceExpiry.getSeconds());
+            }
+
+            if (timeDifferenceExpiry.getSeconds() >= verificationCode.EXPIRY_TIME) {
+                verificationCodeRepository.delete(verificationCode);
+            }
+
         } else {
-            VerificationCode verificationCode = new VerificationCode(checkCode, email);
+            verificationCode = new VerificationCode(checkCode, email);
             verificationCodeRepository.save(verificationCode);
+            sendCheckCodeToEmail(email, verificationCode.getCheckCode());
+            data.put("secondsUntilExpired", verificationCode.EXPIRY_TIME);
         }
 
-        return checkCode;
+        data.put("attempts", verificationCode.getAttemps());
+        data.put("secondsUntilResend", verificationCode.DELAY_TIME);
+
+        return data;
     }
 
-    public void sendCheckCodeToEmail(String email) {
+    private void sendCheckCodeToEmail(String email, int checkCode) {
 
-        Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
+        String message = String.format("Hello! Your check code:\n %s", checkCode);
 
-        if (verificationCodeFromDB.isPresent()) {
-
-            VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
-
-            String message = String.format("Hello! Your check code:\n %s", verificationCode.getCheckCode());
-
-            mailSender.send(email, "Activation code", message);
-        }
+        mailSender.send(email, "Activation code", message);
 
     }
 

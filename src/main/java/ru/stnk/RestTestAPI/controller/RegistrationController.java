@@ -5,15 +5,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.stnk.RestTestAPI.dto.UserDTO;
-import ru.stnk.RestTestAPI.entity.VerificationCode;
-import ru.stnk.RestTestAPI.exception.registration.IncorrectEmailException;
-import ru.stnk.RestTestAPI.exception.registration.IncorrectPasswordException;
-import ru.stnk.RestTestAPI.exception.registration.IncorrectPhoneException;
-import ru.stnk.RestTestAPI.exception.registration.LoginPasswordEqualException;
-import ru.stnk.RestTestAPI.repository.RolesRepository;
-import ru.stnk.RestTestAPI.repository.UserRepository;
+import ru.stnk.RestTestAPI.exception.registration.*;
 import ru.stnk.RestTestAPI.results.RestResponse;
-import ru.stnk.RestTestAPI.service.MailSender;
 import ru.stnk.RestTestAPI.service.UserService;
 
 import javax.validation.*;
@@ -44,11 +37,12 @@ public class RegistrationController {
     ) throws IncorrectEmailException,
             LoginPasswordEqualException,
             IncorrectPasswordException,
-            IncorrectPhoneException {
+            IncorrectPhoneException,
+            DelayException {
 
         RestResponse response = new RestResponse();
 
-        HashMap<String, Object> data = new HashMap<>();
+        //HashMap<String, Object> data = new HashMap<>();
 
         if (password.equals(email)) {
             throw new LoginPasswordEqualException();
@@ -94,11 +88,11 @@ public class RegistrationController {
             }
         }
 
-        data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        userService.sendCheckCodeToEmail(userDTO.getEmail());
+        //userService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.setData(data);
+        response.setData(userService.saveCheckCodeToEmail(userDTO.getEmail()));
 
         return response;
     }
@@ -111,11 +105,12 @@ public class RegistrationController {
     ) throws IncorrectEmailException,
             LoginPasswordEqualException,
             IncorrectPasswordException,
-            IncorrectPhoneException {
+            IncorrectPhoneException,
+            DelayException {
 
         RestResponse response = new RestResponse();
 
-        HashMap<String, Object> data = new HashMap<>();
+        //HashMap<String, Object> data = new HashMap<>();
 
         if (userDTO.getPassword().equals(userDTO.getEmail())) {
             throw new LoginPasswordEqualException();
@@ -133,11 +128,11 @@ public class RegistrationController {
             }
         }
 
-        data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        userService.sendCheckCodeToEmail(userDTO.getEmail());
+        //userService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.setData(data);
+        response.setData(userService.saveCheckCodeToEmail(userDTO.getEmail()));
 
         return response;
     }

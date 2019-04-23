@@ -1,11 +1,17 @@
 package ru.stnk.RestTestAPI.entity;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.Instant;
 
 @Entity
 @Table(name = "users_verification_code")
 public class VerificationCode {
+
+    @Transient
+    public final int EXPIRY_TIME = 300;
+
+    @Transient
+    public final int DELAY_TIME = 60;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,16 +27,10 @@ public class VerificationCode {
     private int attemps;
 
     @Column(name = "create_date")
-    private Long createDate;
+    private Instant createDate;
 
-    private int expiryTime;
-
-    /*private Date calculateExpiryDate(int expiryTimeInMinutes) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Timestamp(cal.getTime().getTime()));
-        cal.add(Calendar.MINUTE, expiryTimeInMinutes);
-        return new Date(cal.getTime().getTime());
-    }*/
+    @Column(name = "delay_date")
+    private Instant delayDate;
 
     public VerificationCode() {}
 
@@ -38,7 +38,8 @@ public class VerificationCode {
         this.checkCode = checkCode;
         this.userEmail = userEmail;
         this.attemps = 3;
-        this.createDate = new Date().getTime();
+        this.createDate = Instant.now();
+        this.delayDate = Instant.now();
     }
 
     public Long getId() {
@@ -69,11 +70,19 @@ public class VerificationCode {
         this.attemps = attemps;
     }
 
-    public Long getCreateDate () {
+    public Instant getCreateDate () {
         return createDate;
     }
 
-    public void setCreateDate(Long createDate) {
+    public void setCreateDate(Instant createDate) {
         this.createDate = createDate;
+    }
+
+    public Instant getDelayDate() {
+        return delayDate;
+    }
+
+    public void setDelayDate(Instant delayDate) {
+        this.delayDate = delayDate;
     }
 }
