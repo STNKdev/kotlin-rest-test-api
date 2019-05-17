@@ -1,7 +1,5 @@
 package ru.stnk.RestTestAPI.results;
 
-import org.springframework.http.HttpStatus;
-
 public class RestResponse<T> {
 
     private T data;

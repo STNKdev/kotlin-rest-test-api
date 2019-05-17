@@ -1,6 +1,7 @@
 package ru.stnk.RestTestAPI.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "roles")
-public class Roles implements Serializable {
+public class Roles implements GrantedAuthority, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,5 +55,10 @@ public class Roles implements Serializable {
 
     public void addUser(User user) {
         users.add(user);
+    }
+
+    @Override
+    public String getAuthority() {
+        return getName();
     }
 }

@@ -1,33 +1,41 @@
 package ru.stnk.RestTestAPI.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import javax.sql.DataSource;
+import ru.stnk.RestTestAPI.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    /*@Autowired
+    private DataSource dataSource;*/
+
     @Autowired
-    DataSource dataSource;
+    private UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
-        auth.jdbcAuthentication().dataSource(dataSource)
+        /*auth.jdbcAuthentication().dataSource(dataSource)
                 //проверка существования пользователя и его состояние enable_user
-                .usersByUsernameQuery("select email,password,enable_user from users where email=?")
+                .usersByUsernameQuery("select email,password,enabled from users where email=?")
                 //запрос роли пользователя
                 .authoritiesByUsernameQuery("select user_email,role_name from user_roles where user_email=?")
                 //нужно для проверки пароля
-                .passwordEncoder(new BCryptPasswordEncoder());
+                .passwordEncoder(new BCryptPasswordEncoder());*/
+
+        //auth.userDetailsService(userDetailsServiceImpl).passwordEncoder(new BCryptPasswordEncoder());
+
+        auth.authenticationProvider(authenticationProvider());
 
     }
 
@@ -37,6 +45,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 //.sessionManagement()
                 //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                //.maximumSessions(2)
+                //.sessionFixation().migrateSession()
                 //.and()
                 //HTTP Basic authentication
                     .httpBasic()
@@ -45,8 +55,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .authorizeRequests()
                     .antMatchers("/reg-start").permitAll()
-                    .antMatchers(HttpMethod.GET, "/add-role").permitAll()
-                    .antMatchers(HttpMethod.GET, "/hello").authenticated()
+                    //.antMatchers(HttpMethod.GET, "/add-role").permitAll()
+                    .antMatchers(HttpMethod.GET, "/auth").permitAll()
+                    .antMatchers(HttpMethod.GET, "/info").authenticated()
                     .antMatchers("/logout").authenticated()
                     .anyRequest().authenticated()
                 .and()
@@ -56,6 +67,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .disable()
                 .logout();
 
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider
+                = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsServiceImpl);
+        authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+        return authProvider;
     }
 
     /*
@@ -81,5 +101,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }*/
 
 
+    /*@Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }*/
 
 }

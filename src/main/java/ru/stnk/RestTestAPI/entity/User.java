@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User extends AuditModel implements Serializable {
+public class User extends AuditModel implements Serializable /*implements UserDetails*/ {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -43,7 +43,16 @@ public class User extends AuditModel implements Serializable {
     @Column(name = "enabled")
     private boolean enabled;
 
-    @ManyToMany
+    /*
+    * По умолчанию ManyToMany(fetch = FetchType.LAZY) получается ошибка
+    * org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
+    *
+    * если оставить fetch = FetchType.EAGER , то ошибки нет
+    *
+    * почему?????!!!! Подумать над решением с fetch = FetchType.LAZY
+    *
+    * */
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="user_roles",
             joinColumns = {@JoinColumn(name="user_id", referencedColumnName="id"),
                             @JoinColumn(name="user_email", referencedColumnName="email")},
@@ -74,12 +83,12 @@ public class User extends AuditModel implements Serializable {
         this.phone = phone;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setPassword (String password) {
         this.password = passwordEncoder(password);
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public boolean getEmailConfirmed() {
@@ -122,7 +131,7 @@ public class User extends AuditModel implements Serializable {
         this.withdrawalBalance = withdrawalBalance;
     }
 
-    public boolean getEnableUser() {
+    public boolean isEnableUser() {
         return enabled;
     }
 

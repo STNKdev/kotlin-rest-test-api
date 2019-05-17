@@ -7,12 +7,6 @@ import java.time.Instant;
 @Table(name = "users_verification_code")
 public class VerificationCode {
 
-    @Transient
-    public final int EXPIRY_TIME = 300;
-
-    @Transient
-    public final int DELAY_TIME = 60;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

@@ -1,6 +1,7 @@
 package ru.stnk.RestTestAPI.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stnk.RestTestAPI.dto.UserDTO;
@@ -20,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class UserService implements IUserService {
+public class ControllerService {
 
     @Autowired
     private UserRepository repository;
@@ -34,8 +35,13 @@ public class UserService implements IUserService {
     @Autowired
     private MailSender mailSender;
 
+    private final int EXPIRY_TIME = 300;
+
+    private final int DELAY_TIME = 60;
+
+    private final int CONFURM_CODE = 9999;
+
     @Transactional
-    @Override
     public User registerNewUserAccount (UserDTO userDTO) throws UserExistException {
 
         if (emailExists(userDTO.getEmail())) {
@@ -47,8 +53,8 @@ public class UserService implements IUserService {
         user.setPassword(userDTO.getPassword());
         user.setPhone(userDTO.getPhone());
         user.setOs(userDTO.getOs());
-        user.setEnableUser(false);
-        user.setEmailConfirmed(false);
+        user.setEnableUser(true);
+        user.setEmailConfirmed(true);
         user.setBetBalance((long) 0);
         user.setFreeBalance((long) 0);
         user.setWithdrawalBalance((long) 0);
@@ -67,7 +73,37 @@ public class UserService implements IUserService {
         return false;
     }
 
-    public Map<String, Object> saveCheckCodeToEmail(String email) throws DelayException {
+    public void checkOfVerificationCode (String email, int checkCode, UserDTO userDTO) throws UserExistException {
+        Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
+        Map<String, Object> data = new HashMap<>();
+
+        if (verificationCodeFromDB.isPresent()) {
+            VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
+            if (checkCode == verificationCode.getCheckCode() || checkCode == CONFURM_CODE) {
+                //Сохраняем в таблицу нового пользователя
+                User newUser = registerNewUserAccount(userDTO);
+                //Удаляем из таблицы users_verification_code пользователя
+                verificationCodeRepository.deleteById(verificationCode.getId());
+
+                UsernamePasswordAuthenticationToken authenticationToken =
+                        new UsernamePasswordAuthenticationToken(newUser.getEmail(), newUser.getPassword());
+
+
+                //Авторизуем пользователя и возвращаем session id
+                /*UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(userDTO.getEmail(), userDTO.getPassword());
+                Authentication auth = this.authenticationProvider.authenticate(authReq);
+                SecurityContext sc = SecurityContextHolder.getContext();
+                sc.setAuthentication(auth);*/
+            } else {
+                Instant requestTime = Instant.now();
+                verificationCode.setAttemps(verificationCode.getAttemps() - 1);
+                verificationCodeRepository.save(verificationCode);
+            }
+        }
+
+    }
+
+    public Map<String, Object> saveCheckCodeToEmail(String email, boolean viaEmail) throws DelayException {
         int checkCode = getRandomIntegerBetweenRange(1000, 9999);
 
         Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
@@ -81,37 +117,44 @@ public class UserService implements IUserService {
             Duration timeDifferenceDelay = Duration.between(verificationCode.getDelayDate(), requestTime);
             Duration timeDifferenceExpiry = Duration.between(verificationCode.getCreateDate(), requestTime);
 
-            if (timeDifferenceDelay.getSeconds() <= verificationCode.DELAY_TIME) {
+            if (timeDifferenceDelay.getSeconds() <= DELAY_TIME) {
                 throw new DelayException();
             } else {
-                sendCheckCodeToEmail(email, verificationCode.getCheckCode());
+                if (viaEmail) {
+                    sendCheckCodeToEmail(email, verificationCode.getCheckCode());
+                }
+
                 verificationCode.setDelayDate(Instant.now());
                 verificationCodeRepository.save(verificationCode);
-                data.put("secondsUntilExpired", verificationCode.EXPIRY_TIME - timeDifferenceExpiry.getSeconds());
+                data.put("secondsUntilExpired", EXPIRY_TIME - timeDifferenceExpiry.getSeconds());
             }
 
-            if (timeDifferenceExpiry.getSeconds() >= verificationCode.EXPIRY_TIME) {
+            if (timeDifferenceExpiry.getSeconds() >= EXPIRY_TIME) {
                 verificationCodeRepository.delete(verificationCode);
             }
 
         } else {
             verificationCode = new VerificationCode(checkCode, email);
             verificationCodeRepository.save(verificationCode);
-            sendCheckCodeToEmail(email, verificationCode.getCheckCode());
-            data.put("secondsUntilExpired", verificationCode.EXPIRY_TIME);
+
+            if (viaEmail) {
+                sendCheckCodeToEmail(email, verificationCode.getCheckCode());
+            }
+
+            data.put("secondsUntilExpired", EXPIRY_TIME);
         }
 
         data.put("attempts", verificationCode.getAttemps());
-        data.put("secondsUntilResend", verificationCode.DELAY_TIME);
+        data.put("secondsUntilResend", DELAY_TIME);
 
         return data;
     }
 
     private void sendCheckCodeToEmail(String email, int checkCode) {
 
-        String message = String.format("Hello! Your check code:\n %s", checkCode);
+        String message = String.format("Привет! Ваш код активации:\n %s", checkCode);
 
-        mailSender.send(email, "Activation code", message);
+        mailSender.send(email, "Проверочный код", message);
 
     }
 
