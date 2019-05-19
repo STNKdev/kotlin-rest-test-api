@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import ru.stnk.RestTestAPI.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -21,6 +22,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsServiceImpl;
+
+    @Autowired
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
+    @Autowired
+    private CustomSimpleUrlAuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    private CustomAuthenticationFailureHandler authenticationFailureHandler;
+
+    //private SimpleUrlAuthenticationFailureHandler authenticationFailureHandler = new SimpleUrlAuthenticationFailureHandler();
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -49,23 +61,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //.sessionFixation().migrateSession()
                 //.and()
                 //HTTP Basic authentication
-                    /*.httpBasic()
+                /*.httpBasic()
                 .and()*/
-                    .rememberMe()
+                .rememberMe()
                 .and()
-                    .authorizeRequests()
-                    .antMatchers("/reg-start").permitAll()
-                    //.antMatchers(HttpMethod.GET, "/add-role").permitAll()
-                    .antMatchers(HttpMethod.GET, "/auth").permitAll()
-                    .antMatchers(HttpMethod.GET, "/currtime").permitAll()
-                    .antMatchers(HttpMethod.GET, "/info").authenticated()
-                    .antMatchers("/logout").authenticated()
-                    .anyRequest().authenticated()
+                .csrf()
+                .disable()
+                .authorizeRequests()
                 .and()
-                    .csrf()
-                    .disable()
-                    .formLogin()
-                    .disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/reg-start").permitAll()
+                //.antMatchers(HttpMethod.GET, "/add-role").permitAll()
+                //.antMatchers(HttpMethod.GET, HttpMethod.POST, "/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/auth").permitAll()
+                .antMatchers(HttpMethod.GET, "/currtime").permitAll()
+                .antMatchers(HttpMethod.GET, "/userinfo").authenticated()
+                .antMatchers("/logout").authenticated()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
+                .and()
                 .logout();
 
     }

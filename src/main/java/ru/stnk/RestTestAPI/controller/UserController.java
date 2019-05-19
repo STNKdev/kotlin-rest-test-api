@@ -15,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 /*@Validated*/
 @RestController
@@ -65,11 +67,20 @@ public class UserController {
 
         //httpServletResponse.setHeader("SET-COOKIE", "SESSION=" + session.getId()); //controllerService.registerUserSecurityContext(email, pass, request).toString();
 
-        request.login(email, pass);
+        try {
+            request.login(email, pass);
+        } catch (ServletException ex) {
+            restResponse.setError(105);
+            restResponse.setDescription("Неправильная пара логин-пароль. Либо нет пользователя с таким логином, либо ошибка в пароле.");
+        }
 
         HttpSession session = request.getSession();
 
-        restResponse.setData(session.getId());
+        Map<String, String> data = new HashMap<>();
+
+        data.put("session_id", session.getId());
+
+        restResponse.setData(data);
 
         //restResponse.setData(controllerService.registerUserSecurityContext(email, pass, request));
 
