@@ -33,7 +33,7 @@ public class RestTestAPIApplication {
 				admin.setPassword("123");
 				admin.setPhone("88002000600");
 				admin.setOs("web");
-				admin.setEnableUser(true);
+				admin.setEnabled(true);
 				admin.setEmailConfirmed(true);
 				admin.setFreeBalance((long) 999999);
 				admin.setRoles(new ArrayList<>());

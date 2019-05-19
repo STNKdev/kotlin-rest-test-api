@@ -198,9 +198,6 @@ public class RegistrationController {
             }
 
             if (errors.containsKey("email")) {
-                /*response.setError(107);
-                response.setDescription(data.get("email").toString());
-                return response;*/
                 throw new IncorrectEmailException();
             } else if (errors.containsKey("password")) {
                 throw new IncorrectPasswordException();

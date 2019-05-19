@@ -9,11 +9,12 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User extends AuditModel implements Serializable /*implements UserDetails*/ {
+public class User extends AuditModel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Id", nullable = false)
+    @Column(name = "Id")
+    @JsonIgnore
     private Long id;
 
     @Column(name = "email", unique = true, nullable = false)
@@ -23,12 +24,14 @@ public class User extends AuditModel implements Serializable /*implements UserDe
     private String phone;
 
     @Column(name = "password", nullable = false)
+    @JsonIgnore
     private String password;
 
     @Column(name = "email_confirmed")
     private boolean emailConfirmed;
 
     @Column(name = "os")
+    @JsonIgnore
     private String os;
 
     @Column(name = "free_balance")
@@ -41,6 +44,7 @@ public class User extends AuditModel implements Serializable /*implements UserDe
     private long withdrawalBalance;
 
     @Column(name = "enabled")
+    @JsonIgnore
     private boolean enabled;
 
     /*
@@ -65,6 +69,14 @@ public class User extends AuditModel implements Serializable /*implements UserDe
     private String passwordEncoder (String password) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(password);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -131,11 +143,11 @@ public class User extends AuditModel implements Serializable /*implements UserDe
         this.withdrawalBalance = withdrawalBalance;
     }
 
-    public boolean isEnableUser() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnableUser (boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 

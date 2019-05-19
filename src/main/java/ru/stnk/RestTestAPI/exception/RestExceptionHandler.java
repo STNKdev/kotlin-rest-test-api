@@ -16,9 +16,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAllExceptions (Exception ex,
-                                             HttpHeaders headers,
-                                             HttpStatus status,
-                                             WebRequest request) {
+                                                       HttpHeaders headers,
+                                                       HttpStatus status,
+                                                       WebRequest request) {
         RestResponse restResponse = new RestResponse (status.value(), ex.getLocalizedMessage());
         return new ResponseEntity<>(restResponse, status);
     }
@@ -32,7 +32,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UserExistException.class)
     public ResponseEntity<Object> handleUserExistException (UserExistException ex,
-                                                                 WebRequest request) {
+                                                            WebRequest request) {
         RestResponse restResponse = new RestResponse (106, "Пользователь существует");
         return new ResponseEntity<>(restResponse, HttpStatus.OK);
     }

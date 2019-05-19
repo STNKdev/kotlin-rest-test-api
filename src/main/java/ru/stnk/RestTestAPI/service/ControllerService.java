@@ -1,9 +1,10 @@
 package ru.stnk.RestTestAPI.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.stnk.RestTestAPI.configuration.SecurityConfig;
 import ru.stnk.RestTestAPI.dto.UserDTO;
 import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.entity.VerificationCode;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class ControllerService {
 
     @Autowired
@@ -33,6 +35,15 @@ public class ControllerService {
     private VerificationCodeRepository verificationCodeRepository;
 
     @Autowired
+    private FindByIndexNameSessionRepository sessionRepository;
+
+    @Autowired
+    private SecurityConfig securityConfig;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
     private MailSender mailSender;
 
     private final int EXPIRY_TIME = 300;
@@ -41,7 +52,6 @@ public class ControllerService {
 
     private final int CONFURM_CODE = 9999;
 
-    @Transactional
     public User registerNewUserAccount (UserDTO userDTO) throws UserExistException {
 
         if (emailExists(userDTO.getEmail())) {
@@ -53,7 +63,7 @@ public class ControllerService {
         user.setPassword(userDTO.getPassword());
         user.setPhone(userDTO.getPhone());
         user.setOs(userDTO.getOs());
-        user.setEnableUser(true);
+        user.setEnabled(true);
         user.setEmailConfirmed(true);
         user.setBetBalance((long) 0);
         user.setFreeBalance((long) 0);
@@ -73,33 +83,22 @@ public class ControllerService {
         return false;
     }
 
-    public void checkOfVerificationCode (String email, int checkCode, UserDTO userDTO) throws UserExistException {
+    public boolean checkOfVerificationCode (String email, int checkCode) throws UserExistException {
         Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
-        Map<String, Object> data = new HashMap<>();
 
         if (verificationCodeFromDB.isPresent()) {
             VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
             if (checkCode == verificationCode.getCheckCode() || checkCode == CONFURM_CODE) {
-                //Сохраняем в таблицу нового пользователя
-                User newUser = registerNewUserAccount(userDTO);
-                //Удаляем из таблицы users_verification_code пользователя
-                verificationCodeRepository.deleteById(verificationCode.getId());
-
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(newUser.getEmail(), newUser.getPassword());
-
-
-                //Авторизуем пользователя и возвращаем session id
-                /*UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(userDTO.getEmail(), userDTO.getPassword());
-                Authentication auth = this.authenticationProvider.authenticate(authReq);
-                SecurityContext sc = SecurityContextHolder.getContext();
-                sc.setAuthentication(auth);*/
+                verificationCodeRepository.delete(verificationCode);
+                return true;
             } else {
                 Instant requestTime = Instant.now();
                 verificationCode.setAttemps(verificationCode.getAttemps() - 1);
                 verificationCodeRepository.save(verificationCode);
             }
         }
+
+        return false;
 
     }
 
@@ -149,6 +148,43 @@ public class ControllerService {
 
         return data;
     }
+
+    public User getUser (String email) {
+
+        Optional userFromDB = repository.findByEmail(email);
+
+        if (userFromDB.isPresent()) {
+            return (User) userFromDB.get();
+        }
+
+        return null;
+    }
+
+    //Оставлю как памятку
+    /*public Session registerUserSecurityContext (String email, String pass, HttpServletRequest request) throws Exception {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        Session session = sessionRepository.createSession();
+        Map<String, String> details = new HashMap<>();
+        details.put("remoteAddress", request.getRemoteAddr());
+        details.put("sessionId", session.getId());
+        UsernamePasswordAuthenticationToken tokenAuth = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), pass, userDetails.getAuthorities());
+        //tokenAuth.setDetails(new WebAuthenticationDetails(request));
+        tokenAuth.setDetails(details);
+
+        Authentication authentication = securityConfig.authenticationManagerBean().authenticate(tokenAuth);
+
+        *//*SecurityContext securityContext = SecurityContextHolder.getContext();
+        securityContext.setAuthentication(authentication);*//*
+        session.setAttribute("SPRING_SECURITY_CONTEXT", new SecurityContextImpl(authentication));
+        sessionRepository.save(session);
+        //Map<String, Object> mapSession = sessionRepository.findByPrincipalName(userDetails.getUsername());
+
+        *//*if (!mapSession.isEmpty()) {
+            return mapSession.toString();
+        }*//*
+
+        return session;
+    }*/
 
     private void sendCheckCodeToEmail(String email, int checkCode) {
 

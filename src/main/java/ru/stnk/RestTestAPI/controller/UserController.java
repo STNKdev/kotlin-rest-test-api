@@ -1,25 +1,15 @@
 package ru.stnk.RestTestAPI.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
-import ru.stnk.RestTestAPI.configuration.SecurityConfig;
-import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.results.RestResponse;
+import ru.stnk.RestTestAPI.service.ControllerService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.security.Principal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /*@Validated*/
 @RestController
@@ -33,16 +23,19 @@ public class UserController {
     //private RestResponse response = new RestResponse();
 
     /*@Autowired
-    private FindByIndexNameSessionRepository sessionRepository;*/
+    private FindByIndexNameSessionRepository sessionRepository;
 
     @Autowired
     private SecurityConfig securityConfig;
 
-    /*@Autowired
-    private ProviderManager authManager;*/
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;*/
 
-    @GetMapping("/info")
-    public RestResponse getInfo (/*@AuthenticationPrincipal User user, */WebRequest request) {
+    @Autowired
+    ControllerService controllerService;
+
+    @GetMapping("/userinfo")
+    public RestResponse getUserInfo (/*@AuthenticationPrincipal UserDetails userDetails, */HttpServletRequest request) {
 
         RestResponse restResponse = new RestResponse();
 
@@ -50,31 +43,26 @@ public class UserController {
 
         //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        //data.put("user", RequestContextHolder.currentRequestAttributes().getSessionId());
-
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("user", principal);
-
-        restResponse.setData(data);
+        restResponse.setData(controllerService.getUser(principal.getName()));
 
         return restResponse;
     }
 
     @GetMapping("/auth")
-    public RestResponse getAuth (/*@RequestParam String email, @RequestParam String pass*/HttpServletRequest request) throws Exception {
+    public RestResponse getAuth (@RequestParam String email, @RequestParam String pass, HttpServletRequest request) throws Exception {
         RestResponse restResponse = new RestResponse();
 
-        UsernamePasswordAuthenticationToken tokenAuth = new UsernamePasswordAuthenticationToken("admin@test.io", "123");
-        //без этого не обновляется SecurityContextHolder (Must be called from request filtered by Spring Security, otherwise SecurityContextHolder is not updated)
-        tokenAuth.setDetails(new WebAuthenticationDetails(request));
+        //Session session = controllerService.registerUserSecurityContext(email, pass, request);
 
-        Authentication authentication = securityConfig.authenticationManagerBean().authenticate(tokenAuth);
+        //httpServletResponse.setHeader("SET-COOKIE", "SESSION=" + session.getId()); //controllerService.registerUserSecurityContext(email, pass, request).toString();
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authentication);
+        request.login(email, pass);
 
-        restResponse.setData(tokenAuth.getDetails());
+        HttpSession session = request.getSession();
+
+        restResponse.setData(session.getId());
+
+        //restResponse.setData(controllerService.registerUserSecurityContext(email, pass, request));
 
         return restResponse;
     }
