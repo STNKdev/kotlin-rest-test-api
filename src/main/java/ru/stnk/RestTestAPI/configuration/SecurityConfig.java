@@ -49,14 +49,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //.sessionFixation().migrateSession()
                 //.and()
                 //HTTP Basic authentication
-                    .httpBasic()
-                .and()
+                    /*.httpBasic()
+                .and()*/
                     .rememberMe()
                 .and()
                     .authorizeRequests()
                     .antMatchers("/reg-start").permitAll()
                     //.antMatchers(HttpMethod.GET, "/add-role").permitAll()
                     .antMatchers(HttpMethod.GET, "/auth").permitAll()
+                    .antMatchers(HttpMethod.GET, "/currtime").permitAll()
                     .antMatchers(HttpMethod.GET, "/info").authenticated()
                     .antMatchers("/logout").authenticated()
                     .anyRequest().authenticated()

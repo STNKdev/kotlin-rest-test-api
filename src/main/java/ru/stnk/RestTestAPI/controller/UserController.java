@@ -1,12 +1,17 @@
 package ru.stnk.RestTestAPI.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.stnk.RestTestAPI.results.RestResponse;
 import ru.stnk.RestTestAPI.service.ControllerService;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
@@ -49,7 +54,11 @@ public class UserController {
     }
 
     @GetMapping("/auth")
-    public RestResponse getAuth (@RequestParam String email, @RequestParam String pass, HttpServletRequest request) throws Exception {
+    public RestResponse getAuth (@RequestParam String email,
+                                 @RequestParam String pass,
+                                 HttpServletRequest request)
+            throws ServletException, BadCredentialsException {
+
         RestResponse restResponse = new RestResponse();
 
         //Session session = controllerService.registerUserSecurityContext(email, pass, request);
