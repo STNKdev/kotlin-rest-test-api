@@ -14,6 +14,8 @@ import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.repository.VerificationCodeRepository;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -83,22 +85,42 @@ public class ControllerService {
         return false;
     }
 
-    public boolean checkOfVerificationCode (String email, int checkCode) throws UserExistException {
-        Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
+    public Map<String, Object> checkOfVerificationCode (UserDTO userDTO, String checkCode, HttpServletRequest request) throws UserExistException, DelayException {
 
+        Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(userDTO.getEmail());
+
+        Map<String, Object> data = new HashMap<>();
         if (verificationCodeFromDB.isPresent()) {
             VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
-            if (checkCode == verificationCode.getCheckCode() || checkCode == CONFURM_CODE) {
+            if (checkCode.equals(verificationCode.getCheckCode()+"") || checkCode.equals(CONFURM_CODE+"")) {
                 verificationCodeRepository.delete(verificationCode);
-                return true;
+                registerNewUserAccount(userDTO);
+                try {
+                    //request.changeSessionId();
+                    request.login(userDTO.getEmail(), userDTO.getPassword());
+                } catch (ServletException ex) {
+
+                }
+                data.put("session_id", request.getSession().getId());
+                return data;
             } else {
                 Instant requestTime = Instant.now();
-                verificationCode.setAttemps(verificationCode.getAttemps() - 1);
-                verificationCodeRepository.save(verificationCode);
+                Duration timeDifferenceExpiry = Duration.between(verificationCode.getCreateDate(), requestTime);
+
+                if (verificationCode.getAttemps() > 0 &&
+                        !(timeDifferenceExpiry.getSeconds() >= EXPIRY_TIME)) {
+                    verificationCode.setAttemps(verificationCode.getAttemps() - 1);
+                    verificationCodeRepository.save(verificationCode);
+                    data.put("attempts", verificationCode.getAttemps());
+                    data.put("secondsUntilExpired", EXPIRY_TIME - timeDifferenceExpiry.getSeconds());
+                } else {
+                    verificationCodeRepository.delete(verificationCode);
+                    data = saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail());
+                }
             }
         }
 
-        return false;
+        return data;
 
     }
 

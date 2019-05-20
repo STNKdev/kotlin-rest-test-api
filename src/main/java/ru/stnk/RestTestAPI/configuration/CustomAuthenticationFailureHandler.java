@@ -1,6 +1,7 @@
 package ru.stnk.RestTestAPI.configuration;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -17,7 +18,6 @@ import java.util.Map;
 
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
@@ -26,11 +26,21 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             throws IOException, ServletException {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        Map<String, String> data = new HashMap<>();
+        response.setContentType("text/plain; charset=UTF-8");
+        /*Map<String, String> data = new HashMap<>();
 
         data.put("error", "105");
-        data.put("description" ,"Неправильная пара логин-пароль. Либо нет пользователя с таким логином, либо ошибка в пароле.");
+        data.put("description" ,"Неправильная пара логин-пароль. Либо нет пользователя с таким логином, либо ошибка в пароле.");*/
 
-        response.getOutputStream().println(objectMapper.writeValueAsString(data));
+        RestResponse restResponse = new RestResponse(105,
+                "Неправильная пара логин-пароль. Либо нет пользователя с таким логином, либо ошибка в пароле.");
+
+        try {
+            response.getWriter().print(new ObjectMapper().writeValueAsString(restResponse));
+        } catch (JsonProcessingException ex) {
+            response.getWriter().print(ex.toString());
+        }
+
+        response.getWriter().flush();
     }
 }

@@ -28,16 +28,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Object> handleBadCredentialsException (Exception ex,
+    public ResponseEntity<Object> handleBadCredentialsException (BadCredentialsException ex,
                                                                  WebRequest request) {
         RestResponse restResponse = new RestResponse (105, ex.getLocalizedMessage());
         return new ResponseEntity<>(restResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException (Exception ex,
+    public ResponseEntity<Object> handleAccessDeniedException (AccessDeniedException ex,
                                                               WebRequest request) {
-        RestResponse restResponse = new RestResponse (HttpStatus.FORBIDDEN.value(), ex.getLocalizedMessage());
+        RestResponse restResponse = new RestResponse (HttpStatus.FORBIDDEN.value(), "Доступ запрещен, необходима аутентификация");
         return new ResponseEntity<>(restResponse, HttpStatus.FORBIDDEN);
     }
 

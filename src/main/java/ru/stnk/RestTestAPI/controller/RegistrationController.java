@@ -9,6 +9,7 @@ import ru.stnk.RestTestAPI.exception.registration.*;
 import ru.stnk.RestTestAPI.results.RestResponse;
 import ru.stnk.RestTestAPI.service.ControllerService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.*;
 import java.util.HashMap;
 import java.util.Set;
@@ -26,7 +27,7 @@ public class RegistrationController {
     private MailSender mailSender;*/
 
     @Autowired
-    private ControllerService userService;
+    private ControllerService controllerService;
 
     @GetMapping("/reg-start")
     public RestResponse preRegistrationGetMethod (
@@ -90,11 +91,11 @@ public class RegistrationController {
             }
         }
 
-        //data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        //userService.sendCheckCodeToEmail(userDTO.getEmail());
+        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.setData(userService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
+        response.setData(controllerService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
 
         return response;
     }
@@ -130,11 +131,11 @@ public class RegistrationController {
             }
         }
 
-        //data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        //userService.sendCheckCodeToEmail(userDTO.getEmail());
+        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.setData(userService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
+        response.setData(controllerService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
 
         return response;
     }
@@ -153,12 +154,14 @@ public class RegistrationController {
             @RequestParam String phone,
             @RequestParam String os,
             @RequestParam String code,
-            @RequestParam(required = false, defaultValue = "true") String viaEmail
+            @RequestParam(required = false, defaultValue = "true") String viaEmail,
+            HttpServletRequest request
     ) throws IncorrectEmailException,
             LoginPasswordEqualException,
             IncorrectPasswordException,
             IncorrectPhoneException,
-            DelayException {
+            DelayException,
+            UserExistException {
 
         RestResponse response = new RestResponse();
 
@@ -206,11 +209,11 @@ public class RegistrationController {
             }
         }
 
-        //data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        //userService.sendCheckCodeToEmail(userDTO.getEmail());
+        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.setData(userService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
+        response.setData(controllerService.checkOfVerificationCode(userDTO, code, request));
 
         return response;
     }
@@ -224,7 +227,8 @@ public class RegistrationController {
             LoginPasswordEqualException,
             IncorrectPasswordException,
             IncorrectPhoneException,
-            DelayException {
+            DelayException,
+            UserExistException {
 
         RestResponse response = new RestResponse();
 
@@ -246,11 +250,11 @@ public class RegistrationController {
             }
         }
 
-        //data.put("checkCode", userService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        //userService.sendCheckCodeToEmail(userDTO.getEmail());
+        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.setData(userService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
+        response.setData(controllerService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
 
         return response;
     }

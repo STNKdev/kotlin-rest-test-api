@@ -1,5 +1,8 @@
 package ru.stnk.RestTestAPI.results;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestResponse<T> {
 
     private T data;
