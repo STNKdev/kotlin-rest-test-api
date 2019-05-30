@@ -17,13 +17,13 @@ public class User extends AuditModel implements Serializable {
     @JsonIgnore
     private Long id;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "phone", unique = true, nullable = false)
+    @Column(name = "phone")
     private String phone;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     @JsonIgnore
     private String password;
 

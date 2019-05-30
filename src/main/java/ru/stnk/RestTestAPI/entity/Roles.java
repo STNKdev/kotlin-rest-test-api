@@ -13,10 +13,10 @@ public class Roles implements GrantedAuthority, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Id", nullable = false)
+    @Column(name = "Id")
     private Long id;
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "name")
     private String name;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
