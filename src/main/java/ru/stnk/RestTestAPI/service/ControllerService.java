@@ -1,7 +1,6 @@
 package ru.stnk.RestTestAPI.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.session.FindByIndexNameSessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stnk.RestTestAPI.configuration.SecurityConfig;
@@ -35,9 +34,6 @@ public class ControllerService {
 
     @Autowired
     private VerificationCodeRepository verificationCodeRepository;
-
-    @Autowired
-    private FindByIndexNameSessionRepository sessionRepository;
 
     @Autowired
     private SecurityConfig securityConfig;

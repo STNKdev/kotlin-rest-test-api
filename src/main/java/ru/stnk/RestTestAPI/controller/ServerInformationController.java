@@ -4,12 +4,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.stnk.RestTestAPI.results.RestResponse;
 
-import java.time.*;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 public class ServerInformationController {
+
     @GetMapping("/currtime")
     public RestResponse currtime () {
         RestResponse restResponse = new RestResponse();

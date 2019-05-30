@@ -10,12 +10,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.session.FindByIndexNameSessionRepository;
+import org.springframework.session.Session;
+import org.springframework.session.security.SpringSessionBackedSessionRegistry;
+import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices;
 import ru.stnk.RestTestAPI.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig<S extends  Session> extends WebSecurityConfigurerAdapter {
 
     /*@Autowired
     private DataSource dataSource;*/
@@ -31,6 +34,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private CustomAuthenticationFailureHandler authenticationFailureHandler;
+
+    @Autowired
+    private SpringSessionRememberMeServices rememberMeServices;
+
+    /*@Autowired
+    private FindByIndexNameSessionRepository<S> sessionRepository;*/
+
+    /*@Autowired
+    private JdbcOperations jdbcOperations;
+
+    @Autowired
+    private PlatformTransactionManager platformTransactionManager;
+
+    private FindByIndexNameSessionRepository sessionRepository = new JdbcOperationsSessionRepository(jdbcOperations, platformTransactionManager);*/
 
     //private SimpleUrlAuthenticationFailureHandler authenticationFailureHandler = new SimpleUrlAuthenticationFailureHandler();
 
@@ -57,13 +74,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 //.sessionManagement()
                 //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                //.maximumSessions(2)
+                //.maximumSessions(2).sessionRegistry(sessionRegistry())
                 //.sessionFixation().migrateSession()
                 //.and()
                 //HTTP Basic authentication
                 /*.httpBasic()
                 .and()*/
                 .rememberMe()
+                .rememberMeServices(rememberMeServices)
                 .and()
                 .csrf()
                 .disable()
@@ -84,10 +102,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
+                .usernameParameter("email")
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
                 .and()
-                .logout();
+                .logout()
+                //.and()
+                //.sessionManagement()
+                //.maximumSessions(2)
+                //.sessionRegistry(sessionRegistry())
+                ;
 
     }
 
@@ -99,6 +123,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
         return authProvider;
     }
+
+    //https://docs.spring.io/spring-session/docs/2.1.6.BUILD-SNAPSHOT/reference/html5/#spring-security-concurrent-sessions
+    /*@Bean
+    public SpringSessionBackedSessionRegistry<S> sessionRegistry() {
+        return new SpringSessionBackedSessionRegistry<>(this.sessionRepository);
+    }*/
 
     /*
      * Взято отсюда
