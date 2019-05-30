@@ -100,7 +100,7 @@ public class SecurityConfig<S extends  Session> extends WebSecurityConfigurerAda
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .usernameParameter("email")
+                //.usernameParameter("email")
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
                 .and()
