@@ -20,7 +20,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException authException) throws IOException {
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("text/plain; charset=UTF-8");
+        response.setContentType("application/json; charset=UTF-8");
 
         RestResponse restResponse = new RestResponse(401,
                 "Необходима аутентификация.");
