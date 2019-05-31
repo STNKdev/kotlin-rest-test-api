@@ -44,7 +44,7 @@ public class CustomSimpleUrlAuthenticationSuccessHandler extends SimpleUrlAuthen
 
         response.setStatus(HttpStatus.OK.value());
 
-        response.setContentType("text/plain; charset=UTF-8");
+        response.setContentType("application/json; charset=UTF-8");
 
         RestResponse restResponse = new RestResponse();
 
