@@ -13,6 +13,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import ru.stnk.RestTestAPI.exception.registration.*;
 import ru.stnk.RestTestAPI.results.RestResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -78,6 +81,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleDelayAttempsException (DelayException ex,
                                                                WebRequest request) {
         RestResponse restResponse = new RestResponse (112, "Слишком рано был запрошен повторный вызов кода подтверждения");
+        if (ex.getDelay() != null) {
+            Map<String, Long> delayInfo = new HashMap<>();
+            delayInfo.put("secondsUntilResend", ex.getDelay());
+            restResponse.setData(delayInfo);
+        }
         return new ResponseEntity<>(restResponse, HttpStatus.OK);
     }
 

@@ -121,37 +121,47 @@ public class ControllerService {
     }
 
     public Map<String, Object> saveCheckCodeToEmail(String email, boolean viaEmail) throws DelayException {
-        int checkCode = getRandomIntegerBetweenRange(1000, 9999);
 
         Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
         VerificationCode verificationCode;
         Map<String, Object> data = new HashMap<>();
+        Instant requestTime = Instant.now();
 
         if (verificationCodeFromDB.isPresent()) {
-            Instant requestTime = Instant.now();
+
             verificationCode = (VerificationCode) verificationCodeFromDB.get();
 
-            Duration timeDifferenceDelay = Duration.between(verificationCode.getDelayDate(), requestTime);
-            Duration timeDifferenceExpiry = Duration.between(verificationCode.getCreateDate(), requestTime);
+            Duration timeDifferenceDelay = Duration.between(requestTime, verificationCode.getDelayDate());
+            Duration timeDifferenceExpiry = Duration.between(requestTime, verificationCode.getExpiredDate());
 
-            if (timeDifferenceDelay.getSeconds() <= DELAY_TIME) {
-                throw new DelayException();
-            } else {
+            if (timeDifferenceDelay.getSeconds() > 0 && timeDifferenceDelay.getSeconds() < DELAY_TIME) {
+                throw new DelayException(timeDifferenceDelay.getSeconds());
+            } else if (timeDifferenceExpiry.getSeconds() < EXPIRY_TIME && timeDifferenceExpiry.getSeconds() > 0) {
                 if (viaEmail) {
                     sendCheckCodeToEmail(email, verificationCode.getCheckCode());
                 }
 
-                verificationCode.setDelayDate(Instant.now());
+                verificationCode.setDelayDate(verificationCode.getDelayDate().plusSeconds(DELAY_TIME));
                 verificationCodeRepository.save(verificationCode);
-                data.put("secondsUntilExpired", EXPIRY_TIME - timeDifferenceExpiry.getSeconds());
+                data.put("secondsUntilExpired", timeDifferenceExpiry.getSeconds());
+                if (timeDifferenceDelay.getSeconds() == 0) {
+                    data.put("secondsUntilResend", DELAY_TIME);
+                } else if (timeDifferenceDelay.getSeconds() < 0) {
+                    data.put("secondsUntilResend", timeDifferenceExpiry.getSeconds() % 60);
+                } else {
+                    data.put("secondsUntilResend", timeDifferenceDelay.getSeconds());
+                }
+
             }
 
-            if (timeDifferenceExpiry.getSeconds() >= EXPIRY_TIME) {
+            if (timeDifferenceExpiry.getSeconds() <= 0) {
                 verificationCodeRepository.delete(verificationCode);
+                return saveCheckCodeToEmail(email, viaEmail);
             }
 
         } else {
-            verificationCode = new VerificationCode(checkCode, email);
+            int checkCode = getRandomIntegerBetweenRange(1000, 9999);
+            verificationCode = new VerificationCode(checkCode, email, DELAY_TIME, requestTime.plusSeconds(EXPIRY_TIME));
             verificationCodeRepository.save(verificationCode);
 
             if (viaEmail) {
@@ -159,10 +169,10 @@ public class ControllerService {
             }
 
             data.put("secondsUntilExpired", EXPIRY_TIME);
+            data.put("secondsUntilResend", DELAY_TIME);
         }
 
         data.put("attempts", verificationCode.getAttemps());
-        data.put("secondsUntilResend", DELAY_TIME);
 
         return data;
     }

@@ -26,14 +26,18 @@ public class VerificationCode {
     @Column(name = "delay_date")
     private Instant delayDate;
 
+    @Column(name = "expired_date")
+    private Instant expiredDate;
+
     public VerificationCode() {}
 
-    public VerificationCode(int checkCode, String userEmail) {
+    public VerificationCode(int checkCode, String userEmail, int startDelay, Instant expiredDate) {
         this.checkCode = checkCode;
         this.userEmail = userEmail;
         this.attemps = 3;
         this.createDate = Instant.now();
-        this.delayDate = Instant.now();
+        this.delayDate = createDate.plusSeconds(startDelay);
+        this.expiredDate = expiredDate;
     }
 
     public Long getId() {
@@ -70,6 +74,14 @@ public class VerificationCode {
 
     public void setCreateDate(Instant createDate) {
         this.createDate = createDate;
+    }
+
+    public Instant getExpiredDate() {
+        return expiredDate;
+    }
+
+    public void setExpiredDate(Instant expiredDate) {
+        this.expiredDate = expiredDate;
     }
 
     public Instant getDelayDate() {
