@@ -6,16 +6,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.socket.client.WebSocketConnectionManager;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import ru.stnk.RestTestAPI.entity.Roles;
 import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
+import ru.stnk.RestTestAPI.service.SimpleWsHandler;
 
 import java.util.ArrayList;
 
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableAsync
+@EnableScheduling
 public class RestTestAPIApplication {
 
 	@Bean
@@ -45,6 +50,26 @@ public class RestTestAPIApplication {
 				userRepository.save(admin);
 			}
 		};
+	}
+
+	@Bean
+	public WebSocketConnectionManager wsConnectionManager(SimpleWsHandler simpleWsHandler) {
+
+		final String webSocketUri = "wss://www.bitmex.com/realtime?" +
+				"subscribe=instrument:XBTUSD,instrument:ETHUSD,instrument:LTCU19,instrument:XRPU19," +
+				"quoteBin1m:XBTUSD,quoteBin1m:ETHUSD,quoteBin1m:LTCU19,quoteBin1m:XRPU19,"+
+				"quoteBin5m:XBTUSD,quoteBin5m:ETHUSD,quoteBin5m:LTCU19,quoteBin5m:XRPU19";
+
+		//Создает web socket подключение
+		WebSocketConnectionManager manager = new WebSocketConnectionManager(
+				new StandardWebSocketClient(),
+				simpleWsHandler, //Должен быть определен для обработки сообщений
+				webSocketUri);
+
+
+		manager.setAutoStartup(true);
+
+		return manager;
 	}
 
 	public static void main(String[] args) {

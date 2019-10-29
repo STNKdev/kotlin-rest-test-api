@@ -1,28 +1,18 @@
 package ru.stnk.RestTestAPI.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.messaging.simp.stomp.StompHeaders;
-import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandler;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.socket.client.WebSocketClient;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
-import org.springframework.web.socket.messaging.WebSocketStompClient;
-import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import ru.stnk.RestTestAPI.results.RestResponse;
+import ru.stnk.RestTestAPI.entity.coins.InstrumentEntity;
+import ru.stnk.RestTestAPI.entity.coins.QuoteBinFiveMinute;
+import ru.stnk.RestTestAPI.entity.coins.QuoteBinOneMinute;
+import ru.stnk.RestTestAPI.repository.InstrumentEntityRepository;
+import ru.stnk.RestTestAPI.repository.QuoteBinFiveMinuteRepository;
+import ru.stnk.RestTestAPI.repository.QuoteBinOneMinuteRepository;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -52,24 +42,70 @@ public class CurrencyMarketController {
         }
     }*/
 
-    private RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private InstrumentEntityRepository instrumentEntityRepository;
 
-    @GetMapping("/quotes")
-    public RestResponse getQuotes () {
+    @Autowired
+    private QuoteBinOneMinuteRepository quoteBinOneMinuteRepository;
 
-        List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
+    @Autowired
+    private QuoteBinFiveMinuteRepository quoteBinFiveMinuteRepository;
 
-// Add the Jackson Message converter
-        messageConverters.add(new MappingJackson2MessageConverter());
+    private final String xbtUsd = "XBTUSD";
+    private final String ethUsd = "ETHUSD";
 
-// Add the message converters to the restTemplate
-        restTemplate.setMessageConverters(messageConverters);
+    //получить все пары валюты
+    @GetMapping("/coins")
+    public ResponseEntity getData () {
+        List<InstrumentEntity> instrumentEntity = instrumentEntityRepository.findAll();
+        return new ResponseEntity(instrumentEntity, HttpStatus.OK);
+    }
+
+    //получить котировки в минутных свечах
+    @GetMapping("/candles-one")
+    public ResponseEntity getCandlesOne (@RequestParam(required = false) String symbol) {
+        if (symbol != null) {
+            if (symbol.equalsIgnoreCase(xbtUsd)) {
+                List<QuoteBinOneMinute> quoteBinOneMinutes = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd);
+                return new ResponseEntity(quoteBinOneMinutes, HttpStatus.OK);
+            }
+            if (symbol.equalsIgnoreCase(ethUsd)) {
+                List<QuoteBinOneMinute> quoteBinOneMinutes = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(ethUsd);
+                return new ResponseEntity(quoteBinOneMinutes, HttpStatus.OK);
+            }
+        }
+
+        List<QuoteBinOneMinute> quoteBinOneMinutes = quoteBinOneMinuteRepository.findAll();
+        return new ResponseEntity(quoteBinOneMinutes, HttpStatus.OK);
+
+    }
+
+    //получить котировки в пятиминутных свечах
+    @GetMapping("/candles-five")
+    public ResponseEntity getCandlesFive (@RequestParam(required = false) String symbol) {
+        if (symbol != null) {
+            if (symbol.equalsIgnoreCase(xbtUsd)) {
+                List<QuoteBinFiveMinute> quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd);
+                return new ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK);
+            }
+            if (symbol.equalsIgnoreCase(ethUsd)) {
+                List<QuoteBinFiveMinute> quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findBySymbolNameOrderByTimestampDesc(ethUsd);
+                return new ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK);
+            }
+        }
+
+        List<QuoteBinFiveMinute> quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findAll();
+        return new ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK);
+    }
+
+    /*private RestTemplate restTemplate = new RestTemplate();
+    * спёр из приложения investing.com
+    @GetMapping("/quotations")
+    public RestResponse getQuotations () {
 
         String url = "https://aappapi.investing.com/get_screen.php?screen_ID=5&v2=1&include_alert_counter=1&time_utc_offset=28800&lang_ID=7&skinID=2";
 
         RestResponse restResponse = new RestResponse();
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("x-os", "Android");
@@ -82,16 +118,23 @@ public class CurrencyMarketController {
         headers.set("ccode_time", "1562913602");
         headers.set("Host", "aappapi.investing.com");
         headers.set("Connection", "Keep-Alive");
-        headers.set("Accept-Encoding", "gzip");
+        headers.set("Accept-Encoding", "application/gzip");
         headers.set("apf_id", "1562913512115-1492646621599829077");
         headers.set("apf_src", "org");
 
-        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+        HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
-        ResponseEntity<ObjectMapper> result = restTemplate.exchange(url, HttpMethod.GET, entity, ObjectMapper.class);
+        ResponseEntity<QuotationsResponse> result = restTemplate.exchange(url, HttpMethod.GET, entity, QuotationsResponse.class);
 
-        restResponse.setData(result);
+        QuotationsData[] data;
+        try {
+            data = result.getBody().getData();
+        } catch (NullPointerException ex) {
+            data = null;
+        }
+
+        restResponse.setData(data[0].getScreen_data().getPairs_data());
 
         return restResponse;
-    }
+    }*/
 }
