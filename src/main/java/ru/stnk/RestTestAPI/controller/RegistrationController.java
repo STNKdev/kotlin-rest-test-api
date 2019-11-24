@@ -29,6 +29,13 @@ public class RegistrationController {
     @Autowired
     private ControllerService controllerService;
 
+    /*
+     *
+     * Обработчики GET и POST запросов /reg-start
+     *
+     * используются для генерации проверочного кода для следующего метода
+     * */
+
     @GetMapping("/reg-start")
     public RestResponse preRegistrationGetMethod (
             @RequestParam String email,
@@ -46,6 +53,7 @@ public class RegistrationController {
 
         //HashMap<String, Object> data = new HashMap<>();
 
+        // Пароль не должен быть email-ом
         if (password.equals(email)) {
             throw new LoginPasswordEqualException();
         }
@@ -144,6 +152,7 @@ public class RegistrationController {
     *
     * Обработчики GET и POST запросов /reg-confirm
     *
+    * используется для завершения регистрации с проверочным кодом из предыдущего метода
     * */
 
 

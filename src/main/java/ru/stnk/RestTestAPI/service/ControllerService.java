@@ -50,6 +50,7 @@ public class ControllerService {
 
     private final int CONFURM_CODE = 9999;
 
+    // Регистрируем нового пользователя
     public User registerNewUserAccount (UserDTO userDTO) throws UserExistException {
 
         if (emailExists(userDTO.getEmail())) {
@@ -81,35 +82,62 @@ public class ControllerService {
         return false;
     }
 
+    // Сверка проверочного кода
     public Map<String, Object> checkOfVerificationCode (UserDTO userDTO, String checkCode, HttpServletRequest request) throws UserExistException, DelayException {
 
+        // Поиск пользователя по email в таблице проверочных кодов
         Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(userDTO.getEmail());
 
         Map<String, Object> data = new HashMap<>();
+
+        // Если пользователь найден
         if (verificationCodeFromDB.isPresent()) {
+
+            // Получаем объект проверочного кода
             VerificationCode verificationCode = (VerificationCode) verificationCodeFromDB.get();
+
+            // Используя автоприведение типов, сравниваем проверочный код
             if (checkCode.equals(verificationCode.getCheckCode()+"") || checkCode.equals(CONFURM_CODE+"")) {
+
+                // Удаляем строку с проверочным кодом
                 verificationCodeRepository.delete(verificationCode);
+                // Регистрируем нового пользователя
                 registerNewUserAccount(userDTO);
+
+                // Авторизовываем нового пользователя и возвращаем id сессии
                 try {
                     //request.changeSessionId();
                     request.login(userDTO.getEmail(), userDTO.getPassword());
                 } catch (ServletException ex) {
 
                 }
+
                 data.put("session_id", request.getSession().getId());
                 return data;
+
             } else {
+
+                /*
+                * Если код не совпал, то однимаем одну попытку
+                * и записываем новые временные ограничения
+                */
+
                 Instant requestTime = Instant.now();
                 Duration timeDifferenceExpiry = Duration.between(verificationCode.getCreateDate(), requestTime);
 
                 if (verificationCode.getAttemps() > 0 &&
                         !(timeDifferenceExpiry.getSeconds() >= EXPIRY_TIME)) {
+
                     verificationCode.setAttemps(verificationCode.getAttemps() - 1);
                     verificationCodeRepository.save(verificationCode);
                     data.put("attempts", verificationCode.getAttemps());
                     data.put("secondsUntilExpired", EXPIRY_TIME - timeDifferenceExpiry.getSeconds());
+
                 } else {
+                    /*
+                    * При исчерпании попыток, генерируем новый проверочный код
+                    * и высылаем его на почту
+                    */
                     verificationCodeRepository.delete(verificationCode);
                     data = saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail());
                 }
@@ -120,6 +148,7 @@ public class ControllerService {
 
     }
 
+    // Генерация проверочного кода и сохранение его в базу
     public Map<String, Object> saveCheckCodeToEmail(String email, boolean viaEmail) throws DelayException {
 
         Optional verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email);
@@ -131,12 +160,19 @@ public class ControllerService {
 
             verificationCode = (VerificationCode) verificationCodeFromDB.get();
 
+            // Задержка для повторной отправки проверочного кода
             Duration timeDifferenceDelay = Duration.between(requestTime, verificationCode.getDelayDate());
+            // Общее время жизни проверочного кода
             Duration timeDifferenceExpiry = Duration.between(requestTime, verificationCode.getExpiredDate());
+
+            /*
+            * Проверка задержки и время жизни проверочного кода
+            */
 
             if (timeDifferenceDelay.getSeconds() > 0 && timeDifferenceDelay.getSeconds() < DELAY_TIME) {
                 throw new DelayException(timeDifferenceDelay.getSeconds());
             } else if (timeDifferenceExpiry.getSeconds() < EXPIRY_TIME && timeDifferenceExpiry.getSeconds() > 0) {
+
                 if (viaEmail) {
                     sendCheckCodeToEmail(email, verificationCode.getCheckCode());
                 }
@@ -144,6 +180,7 @@ public class ControllerService {
                 verificationCode.setDelayDate(verificationCode.getDelayDate().plusSeconds(DELAY_TIME));
                 verificationCodeRepository.save(verificationCode);
                 data.put("secondsUntilExpired", timeDifferenceExpiry.getSeconds());
+
                 if (timeDifferenceDelay.getSeconds() == 0) {
                     data.put("secondsUntilResend", DELAY_TIME);
                 } else if (timeDifferenceDelay.getSeconds() < 0) {
@@ -154,12 +191,18 @@ public class ControllerService {
 
             }
 
+            /*
+            * Если время жизни проверочного кода истекло,
+            * то удаляем из таблицы текущую связку пользователь-проверочный код
+            * и
+            */
             if (timeDifferenceExpiry.getSeconds() <= 0) {
                 verificationCodeRepository.delete(verificationCode);
                 return saveCheckCodeToEmail(email, viaEmail);
             }
 
         } else {
+
             int checkCode = getRandomIntegerBetweenRange(1000, 9999);
             verificationCode = new VerificationCode(checkCode, email, DELAY_TIME, requestTime.plusSeconds(EXPIRY_TIME));
             verificationCodeRepository.save(verificationCode);
@@ -214,6 +257,7 @@ public class ControllerService {
         return session;
     }*/
 
+    // Отправка проверочного кода (в асинхронном режиме)
     private void sendCheckCodeToEmail(String email, int checkCode) {
 
         String message = String.format("Привет! Ваш код активации:\n %s", checkCode);
@@ -222,7 +266,7 @@ public class ControllerService {
 
     }
 
-    //Получить случайное число от min до max
+    //Получить случайное число от min до max для проверочного кода
     private static int getRandomIntegerBetweenRange(int min, int max) {
         int x = (int) (Math.random() * ( (max - min) + 1 )) + min;
         return x;

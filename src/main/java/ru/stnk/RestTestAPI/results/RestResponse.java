@@ -2,6 +2,7 @@ package ru.stnk.RestTestAPI.results;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+// Класс для единого шаблона ответа от сервера
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestResponse<T> {
 

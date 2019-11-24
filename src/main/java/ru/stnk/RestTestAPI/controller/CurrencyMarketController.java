@@ -64,6 +64,8 @@ public class CurrencyMarketController {
     //получить котировки в минутных свечах
     @GetMapping("/candles-one")
     public ResponseEntity getCandlesOne (@RequestParam(required = false) String symbol) {
+
+        // Если параметр symbol не пустой, то возвращаем список котировок определенной валютной пары
         if (symbol != null) {
             if (symbol.equalsIgnoreCase(xbtUsd)) {
                 List<QuoteBinOneMinute> quoteBinOneMinutes = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd);
@@ -75,6 +77,7 @@ public class CurrencyMarketController {
             }
         }
 
+        // Если параметр symbol пустой, то возвращаем список всех доступных котировок
         List<QuoteBinOneMinute> quoteBinOneMinutes = quoteBinOneMinuteRepository.findAll();
         return new ResponseEntity(quoteBinOneMinutes, HttpStatus.OK);
 
@@ -83,6 +86,8 @@ public class CurrencyMarketController {
     //получить котировки в пятиминутных свечах
     @GetMapping("/candles-five")
     public ResponseEntity getCandlesFive (@RequestParam(required = false) String symbol) {
+
+        // Если параметр symbol не пустой, то возвращаем список котировок определенной валютной пары
         if (symbol != null) {
             if (symbol.equalsIgnoreCase(xbtUsd)) {
                 List<QuoteBinFiveMinute> quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd);
@@ -94,6 +99,7 @@ public class CurrencyMarketController {
             }
         }
 
+        // Если параметр symbol пустой, то возвращаем список всех доступных котировок
         List<QuoteBinFiveMinute> quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findAll();
         return new ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK);
     }

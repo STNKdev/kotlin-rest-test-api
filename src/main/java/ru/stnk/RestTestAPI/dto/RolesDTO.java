@@ -1,5 +1,6 @@
 package ru.stnk.RestTestAPI.dto;
 
+// Класс для отправки на клиент роли (Data Transfer Object)
 public class RolesDTO {
 
     private String nameRole;

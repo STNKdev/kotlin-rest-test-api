@@ -3,6 +3,7 @@ package ru.stnk.RestTestAPI.entity;
 import javax.persistence.*;
 import java.time.Instant;
 
+// Класс сущности для связки пользователь-проверочный код
 @Entity
 @Table(name = "users_verification_code")
 public class VerificationCode {
