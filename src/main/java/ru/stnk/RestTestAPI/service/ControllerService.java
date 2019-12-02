@@ -102,6 +102,7 @@ public class ControllerService {
                 // Удаляем строку с проверочным кодом
                 verificationCodeRepository.delete(verificationCode);
                 // Регистрируем нового пользователя
+                // думаю нужно залогировать это событие
                 registerNewUserAccount(userDTO);
 
                 // Авторизовываем нового пользователя и возвращаем id сессии
@@ -109,6 +110,7 @@ public class ControllerService {
                     //request.changeSessionId();
                     request.login(userDTO.getEmail(), userDTO.getPassword());
                 } catch (ServletException ex) {
+                    // этот момент нужно залогировать
 
                 }
 
