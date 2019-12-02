@@ -125,6 +125,9 @@ public class RegistrationControllerTest {
     @Test
     public void registrationConfirmGetMethodTest() throws Exception {
 
+        VerificationCode verificationCode = new VerificationCode();
+
+
         this.mockMvc.perform(get("/reg-start")
                 .param("email", "admin1@test.io")
                 .param("password", "123")
@@ -142,7 +145,7 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("$.data.secondsUntilResend", Matchers.isA(Integer.class)))
                 .andExpect(jsonPath("$.data.attempts", Matchers.isA(Integer.class)));
 
-        verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
+        verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
 
     }
 }
