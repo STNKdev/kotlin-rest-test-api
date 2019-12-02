@@ -17,14 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.stnk.RestTestAPI.dto.UserDTO;
 import ru.stnk.RestTestAPI.entity.Roles;
 import ru.stnk.RestTestAPI.entity.User;
+import ru.stnk.RestTestAPI.entity.VerificationCode;
 import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
+import ru.stnk.RestTestAPI.repository.VerificationCodeRepository;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -47,6 +49,9 @@ public class RegistrationControllerTest {
 
     @MockBean
     private RolesRepository rolesRepository;
+
+    @MockBean
+    private VerificationCodeRepository verificationCodeRepository;
 
     /*@Before
     public void init() {
@@ -89,6 +94,8 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("$.data.secondsUntilResend", Matchers.isA(Integer.class)))
                 .andExpect(jsonPath("$.data.attempts", Matchers.isA(Integer.class)));
 
+        verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
+
     }
 
     @Test
@@ -111,5 +118,7 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("$.data.secondsUntilExpired", Matchers.isA(Integer.class)))
                 .andExpect(jsonPath("$.data.secondsUntilResend", Matchers.isA(Integer.class)))
                 .andExpect(jsonPath("$.data.attempts", Matchers.isA(Integer.class)));
+
+        verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
     }
 }
