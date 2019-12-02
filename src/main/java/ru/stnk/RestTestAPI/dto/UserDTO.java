@@ -13,7 +13,7 @@ public class UserDTO {
     private String email;
 
     @NotBlank
-    @Size(min = 3, message = "Длина пароля должна быть не меньше трёх")
+    @Size(min = 3, message = "Длина пароля должна быть не меньше трёх символов")
     private String password;
 
     @NotBlank
