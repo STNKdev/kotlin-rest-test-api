@@ -35,11 +35,11 @@ public class ControllerService {
     @Autowired
     private VerificationCodeRepository verificationCodeRepository;
 
-    @Autowired
+    /*@Autowired
     private SecurityConfig securityConfig;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;*/
 
     @Autowired
     private MailSender mailSender;

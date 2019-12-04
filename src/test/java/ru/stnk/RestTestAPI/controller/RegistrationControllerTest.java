@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.stnk.RestTestAPI.dto.UserDTO;
+import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.entity.VerificationCode;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.repository.VerificationCodeRepository;
@@ -54,13 +55,13 @@ public class RegistrationControllerTest {
 //    @MockBean
 //    private RolesRepository rolesRepository;
 
-    //Но почему тогда если создать этот фиктивный объект, то тесты  фейлятся, т.к. ответ приходит пустой...
 //    @MockBean
 //    private VerificationCodeRepository verificationCodeRepository;
 
 //    @Autowired
 //    private UserRepository userRepository;
 
+    // Выполняет код перед каждым тестом
     /*@Before
     public void init() {
         rolesRepository.save(new Roles("ROLE_ADMIN"));
@@ -150,6 +151,7 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.data.session_id", Matchers.isA(String.class)));
 
+        verify(userRepository, times(1)).save(any(User.class));
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
 
     }
@@ -175,10 +177,12 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("$.description").exists())
                 .andExpect(jsonPath("$.data.session_id", Matchers.isA(String.class)));
 
+        verify(userRepository, times(1)).save(any(User.class));
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
 
     }
 
+    // Выполняет этот код после каждого теста
     /*@After
     public void cleanup() {
         if (userRepository.findByEmail("admin1@test.io").isPresent()) {
