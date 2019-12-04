@@ -2,12 +2,11 @@ package ru.stnk.RestTestAPI.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.mockito.internal.matchers.Any;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,23 +16,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.stnk.RestTestAPI.dto.UserDTO;
-import ru.stnk.RestTestAPI.entity.Roles;
-import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.entity.VerificationCode;
-import ru.stnk.RestTestAPI.repository.RolesRepository;
 import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.repository.VerificationCodeRepository;
-
-import java.util.ArrayList;
-import java.util.Optional;
+import ru.stnk.RestTestAPI.service.ControllerService;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
@@ -47,14 +40,26 @@ public class RegistrationControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    // Создаём фиктивный объект репозитория (таблицы) с пользователями
+    // Только вот UserRepository используется в ControllerService, а ControllerService вызывается в RegistrationController
+    // Бин UserRepository заменяется в контексте выполнения???
+    // Any existing single bean of the same type defined in the context will be replaced by the mock. If no existing bean is defined a new one will be added.
+    // Значит да, оставлю как памятку.
+    @MockBean
+    private UserRepository userRepository;
+
 //    @MockBean
-//    private UserRepository userRepository;
+//    private ControllerService controllerService;
 
 //    @MockBean
 //    private RolesRepository rolesRepository;
 
+    //Но почему тогда если создать этот фиктивный объект, то тесты  фейлятся, т.к. ответ приходит пустой...
 //    @MockBean
 //    private VerificationCodeRepository verificationCodeRepository;
+
+//    @Autowired
+//    private UserRepository userRepository;
 
     /*@Before
     public void init() {
@@ -98,6 +103,7 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("$.data.attempts", Matchers.isA(Integer.class)));
 
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
+        //verify(controllerService, times(1)).saveCheckCodeToEmail(anyString(), anyBoolean());
 
     }
 
@@ -122,6 +128,7 @@ public class RegistrationControllerTest {
                 .andExpect(jsonPath("$.data.secondsUntilResend", Matchers.isA(Integer.class)))
                 .andExpect(jsonPath("$.data.attempts", Matchers.isA(Integer.class)));
 
+        //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
     }
 
@@ -148,16 +155,19 @@ public class RegistrationControllerTest {
     }
 
     @Test
-    public void dOfRegistrationConfirmGetMethodTest() throws Exception {
+    public void dOfRegistrationConfirmPostMethodTest() throws Exception {
 
-        this.mockMvc.perform(get("/reg-confirm")
-                .param("email", "admin2@test.io")
-                .param("password", "123")
-                .param("phone", "88002000602")
-                .param("os", "android")
-                .param("code", "9999")
-                .param("viaEmail", "false")
-        )
+        UserDTO userDTO = new UserDTO();
+        userDTO.setEmail("admin2@test.io");
+        userDTO.setPassword("123");
+        userDTO.setPhone("88002000602");
+        userDTO.setOs("android");
+        userDTO.setViaEmail(false);
+        userDTO.setCode("9999");
+
+        this.mockMvc.perform(post("/reg-confirm")
+                                .content(objectMapper.writeValueAsString(userDTO))
+                                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
@@ -168,4 +178,16 @@ public class RegistrationControllerTest {
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
 
     }
+
+    /*@After
+    public void cleanup() {
+        if (userRepository.findByEmail("admin1@test.io").isPresent()) {
+            userRepository.delete(userRepository.findByEmail("admin1@test.io").get());
+        }
+
+        if (userRepository.findByEmail("admin2@test.io").isPresent()) {
+            userRepository.delete(userRepository.findByEmail("admin2@test.io").get());
+        }
+
+    }*/
 }

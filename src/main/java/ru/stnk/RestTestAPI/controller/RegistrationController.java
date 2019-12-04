@@ -231,7 +231,8 @@ public class RegistrationController {
     //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
     public RestResponse registrationConfirmPostMethod (
             @Valid @RequestBody UserDTO userDTO,
-            BindingResult bindingResult
+            BindingResult bindingResult,
+            HttpServletRequest request
     ) throws IncorrectEmailException,
             LoginPasswordEqualException,
             IncorrectPasswordException,
@@ -263,7 +264,7 @@ public class RegistrationController {
 
         //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.setData(controllerService.saveCheckCodeToEmail(userDTO.getEmail(), userDTO.isViaEmail()));
+        response.setData(controllerService.checkOfVerificationCode(userDTO, userDTO.getCode(), request));
 
         return response;
     }

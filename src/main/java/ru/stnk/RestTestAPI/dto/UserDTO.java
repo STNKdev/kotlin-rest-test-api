@@ -26,6 +26,8 @@ public class UserDTO {
 
     private boolean viaEmail;
 
+    private String code;
+
     public UserDTO() {
     }
 
@@ -35,6 +37,7 @@ public class UserDTO {
         this.password = password;
         this.os = "";
         this.viaEmail = true;
+        this.code = "";
     }
 
     public String getEmail() {
@@ -75,5 +78,13 @@ public class UserDTO {
 
     public void setViaEmail(boolean viaEmail) {
         this.viaEmail = viaEmail;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }
