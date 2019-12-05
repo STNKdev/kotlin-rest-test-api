@@ -35,11 +35,11 @@ public class ControllerService {
     @Autowired
     private VerificationCodeRepository verificationCodeRepository;
 
-    /*@Autowired
+    @Autowired
     private SecurityConfig securityConfig;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;*/
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private MailSender mailSender;
@@ -53,7 +53,7 @@ public class ControllerService {
     // Регистрируем нового пользователя
     public User registerNewUserAccount (UserDTO userDTO) throws UserExistException {
 
-        if (emailExists(userDTO.getEmail())) {
+        if (userExists(userDTO.getEmail())) {
             throw new UserExistException();
         }
 
@@ -74,7 +74,7 @@ public class ControllerService {
     }
 
     //Проверка на существование пользователя с таким email
-    private boolean emailExists(String email) {
+    private boolean userExists(String email) {
         Optional<User> user = repository.findByEmail(email);
         if (user.isPresent()) {
             return true;
@@ -91,6 +91,7 @@ public class ControllerService {
         Map<String, Object> data = new HashMap<>();
 
         // Если пользователь найден
+        // а если не найден, то придёт пустой ответ...
         if (verificationCodeFromDB.isPresent()) {
 
             // Получаем объект проверочного кода

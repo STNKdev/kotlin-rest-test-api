@@ -7,6 +7,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,8 +59,8 @@ public class RegistrationControllerTest {
 //    @MockBean
 //    private VerificationCodeRepository verificationCodeRepository;
 
-//    @Autowired
-//    private UserRepository userRepository;
+//    @InjectMocks
+//    private ControllerService controllerService;
 
     // Выполняет код перед каждым тестом
     /*@Before
@@ -67,6 +68,7 @@ public class RegistrationControllerTest {
         rolesRepository.save(new Roles("ROLE_ADMIN"));
     }*/
 
+    // Тест GET метода для получения кода подтверждения регистрации
     @Test
     public void aOfPreRegistrationGetMethodTest() throws Exception {
 
@@ -108,6 +110,7 @@ public class RegistrationControllerTest {
 
     }
 
+    // Тест POST метода для получения кода подтверждения регистрации
     @Test
     public void bOfPreRegistrationPostMethodTest() throws Exception {
 
@@ -133,6 +136,7 @@ public class RegistrationControllerTest {
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
     }
 
+    // Тест GET метода для регистрации пользователя и получения Session_id
     @Test
     public void cOfRegistrationConfirmGetMethodTest() throws Exception {
 
@@ -156,6 +160,7 @@ public class RegistrationControllerTest {
 
     }
 
+    // Тест POST метода для регистрации пользователя и получения Session_id
     @Test
     public void dOfRegistrationConfirmPostMethodTest() throws Exception {
 
