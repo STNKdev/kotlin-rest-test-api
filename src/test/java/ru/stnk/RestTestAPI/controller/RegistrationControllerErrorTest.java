@@ -43,14 +43,14 @@ public class RegistrationControllerErrorTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private VerificationCodeRepository verificationCodeRepository;
 
-    @MockBean
-    private UserRepository userRepository;
+//    @MockBean
+//    private UserRepository userRepository;
 
-    @InjectMocks
-    private ControllerService controllerService;
+//    @InjectMocks
+//    private ControllerService controllerService;
 
     /*
      * Тесты возможных регистрационных ошибок:
@@ -126,14 +126,16 @@ public class RegistrationControllerErrorTest {
 //        userDTO.setViaEmail(false);
         Instant requestTime = Instant.now();
 
-        VerificationCode verificationCode = new VerificationCode(1234, "admin1@test.io", 60, requestTime.plusSeconds(300));
+        VerificationCode verificationCode = new VerificationCode(1234, "admin@test.io", 60, requestTime.plusSeconds(300));
 
-        when(verificationCodeRepository.save(verificationCode)).thenReturn(verificationCode);
+        verificationCodeRepository.save(verificationCode);
 
-        verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
+        //when(verificationCodeRepository.save(verificationCode)).thenReturn(verificationCode);
+
+        //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
 
         this.mockMvc.perform(get("/reg-confirm")
-                                .param("email", "admin1@test.io")
+                                .param("email", "admin@test.io")
                                 .param("password", "123")
                                 .param("phone", "88002000600")
                                 .param("os", "android")
