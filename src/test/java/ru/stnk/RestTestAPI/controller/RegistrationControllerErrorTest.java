@@ -3,37 +3,20 @@ package ru.stnk.RestTestAPI.controller;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.stnk.RestTestAPI.dto.UserDTO;
-import ru.stnk.RestTestAPI.entity.Roles;
-import ru.stnk.RestTestAPI.entity.User;
 import ru.stnk.RestTestAPI.entity.VerificationCode;
-import ru.stnk.RestTestAPI.repository.RolesRepository;
-import ru.stnk.RestTestAPI.repository.UserRepository;
 import ru.stnk.RestTestAPI.repository.VerificationCodeRepository;
-import ru.stnk.RestTestAPI.service.ControllerService;
 
 import java.time.Instant;
-import java.util.ArrayList;
 
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -122,14 +105,19 @@ public class RegistrationControllerErrorTest {
     @Test
     public void userExistError() throws Exception {
 
-//        UserDTO userDTO = new UserDTO("admin1@test.io", "88002000600", "123");
-//        userDTO.setViaEmail(false);
-        Instant requestTime = Instant.now();
+        /*
+        * Перед этим нужно добавить в таблицу user_verification_code запись с попытками,
+        * иначе вернется пустой ответ и тест провалится
+        * */
 
-        VerificationCode verificationCode = new VerificationCode(1234, "admin@test.io", 60, requestTime.plusSeconds(300));
+        VerificationCode verificationCode = new VerificationCode(1234,
+                                                        "admin@test.io",
+                                                                    60,
+                                                                    Instant.now().plusSeconds(300));
 
         verificationCodeRepository.save(verificationCode);
 
+        // С не mock object в этих местах ошибки
         //when(verificationCodeRepository.save(verificationCode)).thenReturn(verificationCode);
 
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
@@ -148,5 +136,9 @@ public class RegistrationControllerErrorTest {
                 .andExpect(jsonPath("$.error", Matchers.is(106)))
                 .andExpect(jsonPath("$.description", Matchers.is("Пользователь существует")))
                 .andExpect(jsonPath("$.data").doesNotExist());
+
+        // И стираем запись обязательно
+        // а по логам сам стирает
+        //verificationCodeRepository.deleteById(verificationCode.getId());
     }
 }
