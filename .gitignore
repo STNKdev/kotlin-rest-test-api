@@ -1,5 +1,4 @@
 HELP.md
-/target/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -26,5 +25,13 @@ HELP.md
 /build/
 
 # Maven
-log/
-target/
+/log/
+/target/
+
+# Gradle
+build.gradle.kts
+settings.gradle.kts
+gradlew
+gradlew.bat
+gradle/
+/app.log
