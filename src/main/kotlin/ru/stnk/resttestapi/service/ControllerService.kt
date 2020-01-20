@@ -24,16 +24,12 @@ import javax.servlet.http.HttpServletRequest
 
 @Service
 @Transactional
-class ControllerService {
-
-    @Autowired
-    private val repository: UserRepository? = null
-
-    @Autowired
-    private val rolesRepository: RolesRepository? = null
-
-    @Autowired
-    private val verificationCodeRepository: VerificationCodeRepository? = null
+class ControllerService (
+        @Autowired val repository: UserRepository,
+        @Autowired val rolesRepository: RolesRepository,
+        @Autowired val verificationCodeRepository: VerificationCodeRepository,
+        @Autowired val mailSender: MailSender
+) {
 
     /*@Autowired
     private val securityConfig: SecurityConfig? = null
@@ -41,14 +37,11 @@ class ControllerService {
     @Autowired
     private val userDetailsService: UserDetailsServiceImpl? = null*/
 
-    @Autowired
-    private val mailSender: MailSender? = null
+    private val expiryTime = 300
 
-    private val EXPIRY_TIME = 300
+    private val delayTime = 60
 
-    private val DELAY_TIME = 60
-
-    private val CONFURM_CODE = 9999
+    private val confirmCode = 9999
 
     // Регистрируем нового пользователя
     @Throws(UserExistException::class)
@@ -68,14 +61,14 @@ class ControllerService {
         user.betBalance = 0
         user.freeBalance = 0
         user.withdrawalBalance =  0
-        user.roles.add(rolesRepository!!.findByName("ROLE_USER"))
+        user.roles.add(rolesRepository.findByName("ROLE_USER"))
 
-        return repository!!.save(user)
+        return repository.save(user)
     }
 
     //Проверка на существование пользователя с таким email
     private fun userExists(email: String): Boolean {
-        val user = repository!!.findByEmail(email)
+        val user = repository.findByEmail(email)
         return user.isPresent
     }
 
@@ -84,22 +77,22 @@ class ControllerService {
     fun checkOfVerificationCode(userDTO: UserDTO, checkCode: String, request: HttpServletRequest): Map<String, Any> {
 
         // Поиск пользователя по email в таблице проверочных кодов
-        val verificationCodeFromDB = verificationCodeRepository?.findByUserEmail(userDTO.email)
+        val verificationCodeFromDB = verificationCodeRepository.findByUserEmail(userDTO.email)
 
         var data: MutableMap<String, Any> = HashMap()
 
         // Если пользователь найден
         // а если не найден, то придёт пустой ответ...
-        if (verificationCodeFromDB!!.isPresent) {
+        if (verificationCodeFromDB.isPresent) {
 
             // Получаем объект проверочного кода
             val verificationCode = verificationCodeFromDB.get()
 
             // Используя автоприведение типов, сравниваем проверочный код
-            if (checkCode == verificationCode.checkCode.toString() + "" || checkCode == CONFURM_CODE.toString() + "") {
+            if (checkCode == verificationCode.checkCode.toString() + "" || checkCode == confirmCode.toString() + "") {
 
                 // Удаляем строку с проверочным кодом
-                verificationCodeRepository?.delete(verificationCode)
+                verificationCodeRepository.delete(verificationCode)
                 // Регистрируем нового пользователя
                 // думаю нужно залогировать это событие
                 registerNewUserAccount(userDTO)
@@ -126,19 +119,19 @@ class ControllerService {
                 val requestTime = Instant.now()
                 val timeDifferenceExpiry = Duration.between(verificationCode.createDate, requestTime)
 
-                if (verificationCode.attemps > 0 && timeDifferenceExpiry.seconds < EXPIRY_TIME) {
+                if (verificationCode.attemps > 0 && timeDifferenceExpiry.seconds < expiryTime) {
 
                     verificationCode.attemps = verificationCode.attemps - 1
-                    verificationCodeRepository!!.save(verificationCode)
+                    verificationCodeRepository.save(verificationCode)
                     data["attempts"] = verificationCode.attemps
-                    data["secondsUntilExpired"] = EXPIRY_TIME - timeDifferenceExpiry.seconds
+                    data["secondsUntilExpired"] = expiryTime - timeDifferenceExpiry.seconds
 
                 } else {
                     /*
                     * При исчерпании попыток, генерируем новый проверочный код
                     * и высылаем его на почту
                     */
-                    verificationCodeRepository!!.delete(verificationCode)
+                    verificationCodeRepository.delete(verificationCode)
                     data = saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
                 }
             }
@@ -150,9 +143,9 @@ class ControllerService {
 
     // Генерация проверочного кода и сохранение его в базу
     @Throws(DelayException::class)
-    fun saveCheckCodeToEmail(email: String?, viaEmail: Boolean): MutableMap<String, Any> {
+    fun saveCheckCodeToEmail(email: String, viaEmail: Boolean): MutableMap<String, Any> {
 
-        val verificationCodeFromDB = verificationCodeRepository!!.findByUserEmail(email!!)
+        val verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email)
         val verificationCode: VerificationCode
         val data = HashMap<String, Any>()
         val requestTime = Instant.now()
@@ -170,20 +163,20 @@ class ControllerService {
             * Проверка задержки и время жизни проверочного кода
             */
 
-            if (timeDifferenceDelay.seconds > 0 && timeDifferenceDelay.seconds < DELAY_TIME) {
+            if (timeDifferenceDelay.seconds > 0 && timeDifferenceDelay.seconds < delayTime) {
                 throw DelayException(timeDifferenceDelay.seconds)
-            } else if (timeDifferenceExpiry.seconds < EXPIRY_TIME && timeDifferenceExpiry.seconds > 0) {
+            } else if (timeDifferenceExpiry.seconds < expiryTime && timeDifferenceExpiry.seconds > 0) {
 
                 if (viaEmail) {
                     sendCheckCodeToEmail(email, verificationCode.checkCode)
                 }
 
-                verificationCode.delayDate = verificationCode.delayDate!!.plusSeconds(DELAY_TIME.toLong())
+                verificationCode.delayDate = verificationCode.delayDate!!.plusSeconds(delayTime.toLong())
                 verificationCodeRepository.save(verificationCode)
                 data["secondsUntilExpired"] = timeDifferenceExpiry.seconds
 
                 if (timeDifferenceDelay.seconds == 0L) {
-                    data["secondsUntilResend"] = DELAY_TIME
+                    data["secondsUntilResend"] = delayTime
                 } else if (timeDifferenceDelay.seconds < 0) {
                     data["secondsUntilResend"] = timeDifferenceExpiry.seconds % 60
                 } else {
@@ -205,15 +198,15 @@ class ControllerService {
         } else {
 
             val checkCode = getRandomIntegerBetweenRange(1000, 9999)
-            verificationCode = VerificationCode(checkCode, email, DELAY_TIME, requestTime.plusSeconds(EXPIRY_TIME.toLong()))
+            verificationCode = VerificationCode(checkCode, email, delayTime, requestTime.plusSeconds(expiryTime.toLong()))
             verificationCodeRepository.save(verificationCode)
 
             if (viaEmail) {
                 sendCheckCodeToEmail(email, verificationCode.checkCode)
             }
 
-            data["secondsUntilExpired"] = EXPIRY_TIME
-            data["secondsUntilResend"] = DELAY_TIME
+            data["secondsUntilExpired"] = expiryTime
+            data["secondsUntilResend"] = delayTime
         }
 
         data["attempts"] = verificationCode.attemps
@@ -223,7 +216,7 @@ class ControllerService {
 
     fun getUser(email: String): User? {
 
-        val userFromDB = repository!!.findByEmail(email)
+        val userFromDB = repository.findByEmail(email)
 
         return if (userFromDB.isPresent) {
             userFromDB.get()
@@ -262,13 +255,12 @@ class ControllerService {
 
         val message = String.format("Привет! Ваш код активации:\n %s", checkCode)
 
-        mailSender!!.send(email, "Проверочный код", message)
+        mailSender.send(email, "Код подтверждения", message)
 
     }
 
     //Получить случайное число от min до max для проверочного кода
     private fun getRandomIntegerBetweenRange(min: Int, max: Int): Int {
-        val x = (Math.random() * (max - min + 1)).toInt() + min
-        return x
+        return (Math.random() * (max - min + 1)).toInt() + min
     }
 }

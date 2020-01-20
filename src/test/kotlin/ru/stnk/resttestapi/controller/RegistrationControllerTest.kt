@@ -35,37 +35,39 @@ import ru.stnk.resttestapi.repository.UserRepository
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @AutoConfigureRestDocs(outputDir = "build/generated/documentation")
-class RegistrationControllerTest {
-    @Autowired
-    private val mockMvc: MockMvc? = null
+class RegistrationControllerTest (
+        @Autowired val mockMvc: MockMvc
+) {
+
     // Создаём фиктивный объект репозитория (таблицы) с пользователями
     // Только вот UserRepository используется в ControllerService, а ControllerService вызывается в RegistrationController
     // Бин UserRepository заменяется в контексте выполнения???
     // Any existing single bean of the same type defined in the context will be replaced by the mock. If no existing bean is defined a new one will be added.
     // Значит да, оставлю как памятку.
     @MockBean
-    private val userRepository: UserRepository? = null
+    val userRepository: UserRepository? = null
 
     private val objectMapper = ObjectMapper()
 
     //    @MockBean
-//    private ControllerService controllerService;
-//    @MockBean
-//    private RolesRepository rolesRepository;
-//    @MockBean
-//    private VerificationCodeRepository verificationCodeRepository;
-//    @InjectMocks
-//    private ControllerService controllerService;
-// Выполняет код перед каждым тестом
-/*@Before
-    public void init() {
-        rolesRepository.save(new Roles("ROLE_ADMIN"));
-    }*/
-// Тест GET метода для получения кода подтверждения регистрации
+    //    private ControllerService controllerService;
+    //    @MockBean
+    //    private RolesRepository rolesRepository;
+    //    @MockBean
+    //    private VerificationCodeRepository verificationCodeRepository;
+    //    @InjectMocks
+    //    private ControllerService controllerService;
+    // Выполняет код перед каждым тестом
+    /*@Before
+        public void init() {
+            rolesRepository.save(new Roles("ROLE_ADMIN"));
+        }*/
+    // Тест GET метода для получения кода подтверждения регистрации
     @Test
     @Order(1)
     @Throws(Exception::class)
-    fun preRegistrationGetMethodTest() { /*
+    fun preRegistrationGetMethodTest() {
+        /*
         User user = new User();
         user.setEmail("admin@test.io");
         user.setPassword("123");
@@ -81,7 +83,7 @@ class RegistrationControllerTest {
 
         when(userRepository.save(any(User.class))).thenReturn(user);
         */
-        mockMvc!!.perform(MockMvcRequestBuilders.get("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
                 .param("email", "admin1@test.io")
                 .param("password", "123")
                 .param("phone", "88002000601")
@@ -112,7 +114,7 @@ class RegistrationControllerTest {
                 )
                 ))
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
-//verify(controllerService, times(1)).saveCheckCodeToEmail(anyString(), anyBoolean());
+        //verify(controllerService, times(1)).saveCheckCodeToEmail(anyString(), anyBoolean());
     }
 
     // Тест POST метода для получения кода подтверждения регистрации
@@ -126,7 +128,7 @@ class RegistrationControllerTest {
         userDTO.phone = "88002000602"
         userDTO.os = "android"
         userDTO.isViaEmail = false
-        mockMvc!!.perform(MockMvcRequestBuilders.post("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.post("/reg-start")
                 .content(objectMapper.writeValueAsString(userDTO))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
@@ -145,7 +147,7 @@ class RegistrationControllerTest {
     @Order(2)
     @Throws(Exception::class)
     fun registrationConfirmGetMethodTest() {
-        mockMvc!!.perform(MockMvcRequestBuilders.get("/reg-confirm")
+        mockMvc.perform(MockMvcRequestBuilders.get("/reg-confirm")
                 .param("email", "admin1@test.io")
                 .param("password", "123")
                 .param("phone", "88002000601")
@@ -175,7 +177,7 @@ class RegistrationControllerTest {
         userDTO.os = "android"
         userDTO.isViaEmail = false
         userDTO.code = "9999"
-        mockMvc!!.perform(MockMvcRequestBuilders.post("/reg-confirm")
+        mockMvc.perform(MockMvcRequestBuilders.post("/reg-confirm")
                 .content(objectMapper.writeValueAsString(userDTO))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
@@ -186,8 +188,9 @@ class RegistrationControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
         Mockito.verify(userRepository, VerificationModeFactory.times(1))!!.save(ArgumentMatchers.any(User::class.java))
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
-    } // Выполняет этот код после каждого теста
+    }
 
+    // Выполняет этот код после каждого теста
     /*@After
     public void cleanup() {
         if (userRepository.findByEmail("admin1@test.io").isPresent()) {

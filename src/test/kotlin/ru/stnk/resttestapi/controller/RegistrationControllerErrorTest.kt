@@ -19,25 +19,23 @@ import java.time.Instant
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class RegistrationControllerErrorTest {
-    @Autowired
-    private val mockMvc: MockMvc? = null
-    @Autowired
-    private val verificationCodeRepository: VerificationCodeRepository? = null
-
+class RegistrationControllerErrorTest (
+        @Autowired val mockMvc: MockMvc,
+        @Autowired val verificationCodeRepository: VerificationCodeRepository
+) {
     //    @MockBean
-//    private UserRepository userRepository;
-//    @InjectMocks
-//    private ControllerService controllerService;
-/*
-     * Тесты возможных регистрационных ошибок:
-     * 106 - пользователь существует
-     * 107 - неккоректный email
-     * 108 - пароль не должен совпадать с логином
-     * 111 - неккоректный формат номера телефона
-     * 112 - слишком рано был запрошен повторный вызов кода подтверждения
-     * */
-// Проверка неккоректного email
+    //    private UserRepository userRepository;
+    //    @InjectMocks
+    //    private ControllerService controllerService;
+    /*
+        * Тесты возможных регистрационных ошибок:
+        * 106 - пользователь существует
+        * 107 - неккоректный email
+        * 108 - пароль не должен совпадать с логином
+        * 111 - неккоректный формат номера телефона
+        * 112 - слишком рано был запрошен повторный вызов кода подтверждения
+        * */
+    // Проверка неккоректного email
     @Test
     @Throws(Exception::class)
     fun notCorrectEmailError() {
