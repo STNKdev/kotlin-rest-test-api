@@ -29,9 +29,5 @@ HELP.md
 /target/
 
 # Gradle
-build.gradle.kts
-settings.gradle.kts
-gradlew
-gradlew.bat
-gradle/
+!gradle/wrapper
 /app.log
