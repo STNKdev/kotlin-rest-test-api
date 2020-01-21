@@ -39,7 +39,7 @@ class RegistrationControllerErrorTest (
     @Test
     @Throws(Exception::class)
     fun notCorrectEmailError() {
-        mockMvc!!.perform(MockMvcRequestBuilders.get("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
                 .param("email", "admin1_test.io")
                 .param("password", "123")
                 .param("phone", "88002000601")
@@ -58,7 +58,7 @@ class RegistrationControllerErrorTest (
     @Test
     @Throws(Exception::class)
     fun equalLoginPasswordError() {
-        mockMvc!!.perform(MockMvcRequestBuilders.get("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
                 .param("email", "admin1@test.io")
                 .param("password", "admin1@test.io")
                 .param("phone", "88002000601")
@@ -77,7 +77,7 @@ class RegistrationControllerErrorTest (
     @Test
     @Throws(Exception::class)
     fun checkNumberPhoneError() {
-        mockMvc!!.perform(MockMvcRequestBuilders.get("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
                 .param("email", "admin1@test.io")
                 .param("password", "123")
                 .param("phone", "+8(495) 302-66-88")
@@ -95,7 +95,8 @@ class RegistrationControllerErrorTest (
     // Проверка на существование такого же пользователя
     @Test
     @Throws(Exception::class)
-    fun userExistError() { /*
+    fun userExistError() {
+        /*
         * Перед этим нужно добавить в таблицу user_verification_code запись с попытками,
         * иначе вернется пустой ответ и тест провалится
         * */
@@ -103,11 +104,11 @@ class RegistrationControllerErrorTest (
                 "admin@test.io",
                 60,
                 Instant.now().plusSeconds(300))
-        verificationCodeRepository!!.save(verificationCode)
+        verificationCodeRepository.save(verificationCode)
         // С не mock object в этих местах ошибки
 //when(verificationCodeRepository.save(verificationCode)).thenReturn(verificationCode);
 //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
-        mockMvc!!.perform(MockMvcRequestBuilders.get("/reg-confirm")
+        mockMvc.perform(MockMvcRequestBuilders.get("/reg-confirm")
                 .param("email", "admin@test.io")
                 .param("password", "123")
                 .param("phone", "88002000600")
@@ -122,7 +123,7 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Пользователь существует")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
         // И стираем запись обязательно
-// а по логам сам стирает
-//verificationCodeRepository.deleteById(verificationCode.getId());
+        // а по логам сам стирает
+        //verificationCodeRepository.deleteById(verificationCode.getId());
     }
 }

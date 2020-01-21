@@ -197,7 +197,9 @@ class ControllerService (
 
         } else {
 
-            val checkCode = getRandomIntegerBetweenRange(1000, 9999)
+            // Задал функции параметры по умолчанию, в целом можно вообще не создавать переменную
+            // val checkCode = getRandomIntegerBetweenRange(1000, 9999)
+            val checkCode = getRandomIntegerBetweenRange()
             verificationCode = VerificationCode(checkCode, email, delayTime, requestTime.plusSeconds(expiryTime.toLong()))
             verificationCodeRepository.save(verificationCode)
 
@@ -260,7 +262,7 @@ class ControllerService (
     }
 
     //Получить случайное число от min до max для проверочного кода
-    private fun getRandomIntegerBetweenRange(min: Int, max: Int): Int {
+    private fun getRandomIntegerBetweenRange(min: Int = 1000, max: Int = 9998): Int {
         return (Math.random() * (max - min + 1)).toInt() + min
     }
 }
