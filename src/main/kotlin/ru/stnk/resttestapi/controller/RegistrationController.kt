@@ -13,7 +13,9 @@ import javax.validation.Valid
 import javax.validation.Validation
 
 @RestController
-class RegistrationController {
+class RegistrationController (
+        @Autowired val controllerService: ControllerService
+) {
 
     /*@Autowired
     private UserRepository userRepository;
@@ -23,9 +25,6 @@ class RegistrationController {
 
     @Autowired
     private MailSender mailSender;*/
-
-    @Autowired
-    private var controllerService: ControllerService? = null
 
     /*
      *
@@ -98,7 +97,7 @@ class RegistrationController {
 
         //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.data = controllerService!!.saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
+        response.data = controllerService.saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
 
         return response
     }
@@ -135,7 +134,7 @@ class RegistrationController {
 
         //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.data = controllerService!!.saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
+        response.data = controllerService.saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
 
         return response
     }
@@ -210,7 +209,7 @@ class RegistrationController {
 
         //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.data = controllerService!!.checkOfVerificationCode(userDTO, code, request)
+        response.data = controllerService.checkOfVerificationCode(userDTO, code, request)
 
         return response
     }
@@ -248,7 +247,7 @@ class RegistrationController {
 
         //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.data = controllerService!!.checkOfVerificationCode(userDTO, userDTO.code, request)
+        response.data = controllerService.checkOfVerificationCode(userDTO, userDTO.code, request)
 
         return response
     }

@@ -3,6 +3,8 @@ package ru.stnk.resttestapi.service
 //import ru.stnk.resttestapi.configuration.SecurityConfig
 //import ru.stnk.resttestapi.entity.Roles
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,6 +39,8 @@ class ControllerService (
     @Autowired
     private val userDetailsService: UserDetailsServiceImpl? = null*/
 
+    private val logger: Logger = LoggerFactory.getLogger(ControllerService::class.java)
+
     private val expiryTime = 300
 
     private val delayTime = 60
@@ -67,8 +71,8 @@ class ControllerService (
     }
 
     //Проверка на существование пользователя с таким email
-    private fun userExists(email: String): Boolean {
-        val user = repository.findByEmail(email)
+    /*private*/ fun userExists(email: String): Boolean {
+        val user: Optional<User> = repository.findByEmail(email)
         return user.isPresent
     }
 
@@ -88,14 +92,15 @@ class ControllerService (
             // Получаем объект проверочного кода
             val verificationCode = verificationCodeFromDB.get()
 
-            // Используя автоприведение типов, сравниваем проверочный код
-            if (checkCode == verificationCode.checkCode.toString() + "" || checkCode == confirmCode.toString() + "") {
+            // Используя автоприведение типов, сравниваем проверочный код <- так было удобно в java
+            if (checkCode.equals(verificationCode.checkCode.toString()) || checkCode.equals(confirmCode.toString()) ) {
 
                 // Удаляем строку с проверочным кодом
                 verificationCodeRepository.delete(verificationCode)
                 // Регистрируем нового пользователя
-                // думаю нужно залогировать это событие
-                registerNewUserAccount(userDTO)
+                val newUser: User = registerNewUserAccount(userDTO)
+
+                logger.info("Зарегистрирован новый пользователь id ${newUser.id} email: ${newUser.email}")
 
                 // Авторизовываем нового пользователя и возвращаем id сессии
                 try {
@@ -103,7 +108,7 @@ class ControllerService (
                     request.login(userDTO.email, userDTO.password)
                 } catch (ex: ServletException) {
                     // этот момент нужно залогировать
-
+                    logger.debug("Ошибка при авторизации пользователя id: ${newUser.id} и email: ${newUser.email}" + ex.localizedMessage)
                 }
 
                 data["session_id"] = request.session.id

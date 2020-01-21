@@ -6,12 +6,18 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.stnk.resttestapi.entity.coins.InstrumentEntity
 import ru.stnk.resttestapi.repository.InstrumentEntityRepository
 import ru.stnk.resttestapi.repository.QuoteBinFiveMinuteRepository
 import ru.stnk.resttestapi.repository.QuoteBinOneMinuteRepository
+import ru.stnk.resttestapi.results.RestResponse
 
 @RestController
-class CurrencyMarketController {
+class CurrencyMarketController (
+        @Autowired val instrumentEntityRepository: InstrumentEntityRepository,
+        @Autowired val quoteBinOneMinuteRepository: QuoteBinOneMinuteRepository,
+        @Autowired val quoteBinFiveMinuteRepository: QuoteBinFiveMinuteRepository
+) {
 
     /*WebSocketClient client = new StandardWebSocketClient();
     WebSocketStompClient stompClient = new WebSocketStompClient(client);
@@ -37,25 +43,26 @@ class CurrencyMarketController {
         }
     }*/
 
-    @Autowired
-    private val instrumentEntityRepository: InstrumentEntityRepository? = null
-
-    @Autowired
-    private val quoteBinOneMinuteRepository: QuoteBinOneMinuteRepository? = null
-
-    @Autowired
-    private val quoteBinFiveMinuteRepository: QuoteBinFiveMinuteRepository? = null
-
     private val xbtUsd = "XBTUSD"
     private val ethUsd = "ETHUSD"
 
-    //получить все пары валюты
-    val data: ResponseEntity<*>
+    /*//получить все пары валюты
+    val data: ResponseEntity
         @GetMapping("/coins")
         get() {
             val instrumentEntity = instrumentEntityRepository!!.findAll()
             return ResponseEntity(instrumentEntity, HttpStatus.OK)
         }
+    */
+
+    //получить все пары валюты
+    @GetMapping("/coins")
+    fun getCoins (): RestResponse {
+        val restResponse: RestResponse = RestResponse()
+        val instrumentEntity: List<InstrumentEntity> = instrumentEntityRepository.findAll()
+        restResponse.data = instrumentEntity
+        return restResponse
+    }
 
     //получить котировки в минутных свечах
     @GetMapping("/candles-one")
@@ -64,17 +71,17 @@ class CurrencyMarketController {
         // Если параметр symbol не пустой, то возвращаем список котировок определенной валютной пары
         if (symbol != null) {
             if (symbol.equals(xbtUsd, ignoreCase = true)) {
-                val quoteBinOneMinutes = quoteBinOneMinuteRepository!!.findBySymbolNameOrderByTimestampDesc(xbtUsd)
+                val quoteBinOneMinutes = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd)
                 return ResponseEntity(quoteBinOneMinutes, HttpStatus.OK)
             }
             if (symbol.equals(ethUsd, ignoreCase = true)) {
-                val quoteBinOneMinutes = quoteBinOneMinuteRepository!!.findBySymbolNameOrderByTimestampDesc(ethUsd)
+                val quoteBinOneMinutes = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(ethUsd)
                 return ResponseEntity(quoteBinOneMinutes, HttpStatus.OK)
             }
         }
 
         // Если параметр symbol пустой, то возвращаем список всех доступных котировок
-        val quoteBinOneMinutes = quoteBinOneMinuteRepository!!.findAll()
+        val quoteBinOneMinutes = quoteBinOneMinuteRepository.findAll()
         return ResponseEntity(quoteBinOneMinutes, HttpStatus.OK)
 
     }
@@ -86,17 +93,17 @@ class CurrencyMarketController {
         // Если параметр symbol не пустой, то возвращаем список котировок определенной валютной пары
         if (symbol != null) {
             if (symbol.equals(xbtUsd, ignoreCase = true)) {
-                val quoteBinFiveMinutes = quoteBinFiveMinuteRepository!!.findBySymbolNameOrderByTimestampDesc(xbtUsd)
+                val quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd)
                 return ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK)
             }
             if (symbol.equals(ethUsd, ignoreCase = true)) {
-                val quoteBinFiveMinutes = quoteBinFiveMinuteRepository!!.findBySymbolNameOrderByTimestampDesc(ethUsd)
+                val quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findBySymbolNameOrderByTimestampDesc(ethUsd)
                 return ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK)
             }
         }
 
         // Если параметр symbol пустой, то возвращаем список всех доступных котировок
-        val quoteBinFiveMinutes = quoteBinFiveMinuteRepository!!.findAll()
+        val quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findAll()
         return ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK)
     }
 

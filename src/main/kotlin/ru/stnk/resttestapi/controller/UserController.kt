@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletRequest
 
 /*@Validated*/
 @RestController
-class UserController {
+class UserController (
+        @Autowired val controllerService: ControllerService
+) {
 
     /*@Autowired
     private UserRepository userRepository;*/
@@ -31,9 +33,6 @@ class UserController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;*/
-
-    @Autowired
-    internal lateinit var controllerService: ControllerService
 
     @GetMapping("/userinfo")
     fun getUserInfo(/*@AuthenticationPrincipal UserDetails userDetails, */request: HttpServletRequest): RestResponse {

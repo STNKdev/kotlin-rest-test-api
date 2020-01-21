@@ -11,7 +11,7 @@ class User : AuditModel(), Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Id")
+    @Column(name = "id")
     @JsonIgnore
     var id: Long? = null
 
@@ -33,7 +33,7 @@ class User : AuditModel(), Serializable {
 
     @Column(name = "os")
     @JsonIgnore
-    var os: String = ""
+    var os: String = "none"
 
     @Column(name = "free_balance")
     var freeBalance: Long = 0

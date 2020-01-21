@@ -9,7 +9,6 @@ import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
-import org.mockito.internal.verification.VerificationModeFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -26,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import ru.stnk.resttestapi.dto.UserDTO
+import ru.stnk.resttestapi.entity.Roles
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.repository.UserRepository
 
@@ -39,14 +39,9 @@ class RegistrationControllerTest (
         @Autowired val mockMvc: MockMvc
 ) {
 
-    // Создаём фиктивный объект репозитория (таблицы) с пользователями
-    // Только вот UserRepository используется в ControllerService, а ControllerService вызывается в RegistrationController
-    // Бин UserRepository заменяется в контексте выполнения???
-    // Any existing single bean of the same type defined in the context will be replaced by the mock. If no existing bean is defined a new one will be added.
-    // Значит да, оставлю как памятку.
-    // update: после перехода на Kotlin, из-за этого кода валится тест
-    //@MockBean
-    //val userRepository: UserRepository? = null
+    // Подменяем репозиторий, чтобы в базу не ходил и не создавал нам там пользователей
+    @MockBean
+    val userRepository: UserRepository? = null
 
     private val objectMapper = ObjectMapper()
 
@@ -129,6 +124,7 @@ class RegistrationControllerTest (
         userDTO.phone = "88002000602"
         userDTO.os = "android"
         userDTO.isViaEmail = false
+
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-start")
                 .content(objectMapper.writeValueAsString(userDTO))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
@@ -148,6 +144,20 @@ class RegistrationControllerTest (
     @Order(2)
     @Throws(Exception::class)
     fun registrationConfirmGetMethodTest() {
+
+        val mockUser: User = User()
+        mockUser.email = "admin1@test.io"
+        mockUser.phone = "88002000601"
+        mockUser.password = "123"
+        mockUser.os = "android"
+        mockUser.isEnabled = true
+        mockUser.emailConfirmed = true
+        mockUser.roles.add(Roles("ROLE_USER"))
+
+        // Используем when().thenReturn(), чтобы при попытке сохранить пользователя нам вернули нашего пользователя
+        // иначе будут ошибки ( repository.save(user) must not be null )
+        Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
+
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-confirm")
                 .param("email", "admin1@test.io")
                 .param("password", "123")
@@ -171,15 +181,27 @@ class RegistrationControllerTest (
     @Order(4)
     @Throws(Exception::class)
     fun registrationConfirmPostMethodTest() {
-        val userDTO = UserDTO()
-        userDTO.email = "admin2@test.io"
-        userDTO.password = "123"
-        userDTO.phone = "88002000602"
-        userDTO.os = "android"
-        userDTO.isViaEmail = false
-        userDTO.code = "9999"
+        val mockUserDTO = UserDTO()
+        mockUserDTO.email = "admin2@test.io"
+        mockUserDTO.password = "123"
+        mockUserDTO.phone = "88002000602"
+        mockUserDTO.os = "android"
+        mockUserDTO.isViaEmail = false
+        mockUserDTO.code = "9999"
+
+        val mockUser: User = User()
+        mockUser.email = "admin1@test.io"
+        mockUser.phone = "88002000601"
+        mockUser.password = "123"
+        mockUser.os = "android"
+        mockUser.isEnabled = true
+        mockUser.emailConfirmed = true
+        mockUser.roles.add(Roles("ROLE_USER"))
+
+        Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
+
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-confirm")
-                .content(objectMapper.writeValueAsString(userDTO))
+                .content(objectMapper.writeValueAsString(mockUserDTO))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
