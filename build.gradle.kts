@@ -5,6 +5,8 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.8.RELEASE"
 	//id("org.flywaydb.flyway") version "6.1.4"
 
+	id("org.asciidoctor.convert") version "2.4.0"
+
 	kotlin("jvm") version "1.3.61"
 	kotlin("plugin.spring") version "1.3.61"
 	kotlin("plugin.jpa") version "1.3.61"
@@ -59,14 +61,18 @@ dependencies {
 
 	// Spring RESTDocs
 	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+	asciidoctor("org.springframework.restdocs:spring-restdocs-asciidoctor")
 
 	// Flyway
 	implementation("org.flywaydb:flyway-core")
 
 }
 
+val snippetsDir by extra { file("build/generated/documentation") }
+
 tasks.withType<Test> {
 	useJUnitPlatform()
+	outputs.dir(snippetsDir)
 }
 
 tasks.withType<KotlinCompile> {
@@ -80,4 +86,12 @@ allOpen {
 	annotation("javax.persistence.Entity")
 	annotation("javax.persistence.Embeddable")
 	annotation("javax.persistence.MappedSuperclass")
+}
+
+tasks {
+
+	asciidoctor {
+		inputs.dir(snippetsDir)
+		dependsOn(test)
+	}
 }

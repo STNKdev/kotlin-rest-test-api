@@ -135,6 +135,21 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilExpired", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
+                .andDo(MockMvcRestDocumentation.document("{methodName}", RequestDocumentation.requestParameters(
+                        RequestDocumentation.parameterWithName("email").description("Email пользователя"),
+                        RequestDocumentation.parameterWithName("password").description("Пароль пользователя"),
+                        RequestDocumentation.parameterWithName("phone").description("Номер телефона пользователя"),
+                        RequestDocumentation.parameterWithName("os").description("Используемая система пользователя"),
+                        RequestDocumentation.parameterWithName("viaEmail").description("Отправлять ли письмо на указанный Email").optional()
+                ), PayloadDocumentation.responseFields(
+                        PayloadDocumentation.fieldWithPath("error").description("Содержит код ошибки"),
+                        PayloadDocumentation.fieldWithPath("description").description("Содержит описание ошибки"),
+                        PayloadDocumentation.subsectionWithPath("data").description("Содержит данные запроса"),
+                        PayloadDocumentation.fieldWithPath("data['secondsUntilExpired']").description("Время, через которое истечет проверочный код"),
+                        PayloadDocumentation.fieldWithPath("data['secondsUntilResend']").description("Время, для повторного запроса проверочного кода"),
+                        PayloadDocumentation.fieldWithPath("data['attempts']").description("Число попыток для ввода проверочного кода")
+                )
+                ))
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
     }
