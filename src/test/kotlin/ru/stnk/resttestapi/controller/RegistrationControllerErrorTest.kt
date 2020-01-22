@@ -3,7 +3,6 @@ package ru.stnk.resttestapi.controller
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
@@ -11,12 +10,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
+import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.entity.VerificationCode
 import ru.stnk.resttestapi.repository.VerificationCodeRepository
 import java.time.Instant
@@ -62,6 +62,14 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(107)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Некорректный email")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error")
+                                        .description("Содержит код ошибки"),
+                                PayloadDocumentation.fieldWithPath("description")
+                                        .description("Содержит описание ошибки")
+                        )
+                ))
     }
 
     // Проверка совпадения логина с паролем
@@ -81,6 +89,14 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(108)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Пароль не должен совпадать с логином")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error")
+                                        .description("Содержит код ошибки"),
+                                PayloadDocumentation.fieldWithPath("description")
+                                        .description("Содержит описание ошибки")
+                        )
+                ))
     }
 
     // Проверка формата номера телефона
@@ -100,6 +116,14 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(111)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Некорректный номер телефона")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error")
+                                        .description("Содержит код ошибки"),
+                                PayloadDocumentation.fieldWithPath("description")
+                                        .description("Содержит описание ошибки")
+                        )
+                ))
     }
 
     // Проверка на существование такого же пользователя
@@ -107,9 +131,9 @@ class RegistrationControllerErrorTest (
     @Throws(Exception::class)
     fun userExistError() {
 
-        val userEmail: String = "admin@test.io"
+        val userEmail = "admin@test.io"
 
-        val verificationCode: VerificationCode = VerificationCode(1234,
+        val verificationCode = VerificationCode(1234,
                 userEmail,
                 60,
                 Instant.now().plusSeconds(300))
@@ -131,6 +155,14 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(106)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Пользователь существует")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error")
+                                        .description("Содержит код ошибки"),
+                                PayloadDocumentation.fieldWithPath("description")
+                                        .description("Содержит описание ошибки")
+                        )
+                ))
 
         Mockito.verify(verificationCodeRepository, Mockito.times(1))?.findByUserEmail(userEmail)
         Mockito.verify(verificationCodeRepository, Mockito.times(0))?.save(verificationCode)

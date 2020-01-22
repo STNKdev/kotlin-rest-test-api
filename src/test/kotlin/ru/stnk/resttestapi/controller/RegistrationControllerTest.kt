@@ -169,7 +169,7 @@ class RegistrationControllerTest (
     @Throws(Exception::class)
     fun registrationConfirmGetMethodTest() {
 
-        val mockUser: User = User()
+        val mockUser = User()
         mockUser.email = "user1@test.io"
         mockUser.phone = "88002000601"
         mockUser.password = "123"
@@ -183,7 +183,7 @@ class RegistrationControllerTest (
         Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
 
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-confirm")
-                .param("email", "admin1@test.io")
+                .param("email", "user1@test.io")
                 .param("password", "123")
                 .param("phone", "88002000601")
                 .param("os", "android")
@@ -244,7 +244,7 @@ class RegistrationControllerTest (
         mockUserDTO.code = "9999"
 
         // Пользователь для возврата из базы в подмененном userRepository
-        val mockUser: User = User()
+        val mockUser = User()
         mockUser.email = "user1@test.io"
         mockUser.phone = "88002000601"
         mockUser.password = "123"
