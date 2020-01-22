@@ -45,14 +45,6 @@ class RegistrationControllerTest (
 
     private val objectMapper = ObjectMapper()
 
-    //    @MockBean
-    //    private ControllerService controllerService;
-    //    @MockBean
-    //    private RolesRepository rolesRepository;
-    //    @MockBean
-    //    private VerificationCodeRepository verificationCodeRepository;
-    //    @InjectMocks
-    //    private ControllerService controllerService;
     // Выполняет код перед каждым тестом
     /*@Before
         public void init() {
@@ -63,24 +55,9 @@ class RegistrationControllerTest (
     @Order(1)
     @Throws(Exception::class)
     fun preRegistrationGetMethodTest() {
-        /*
-        User user = new User();
-        user.setEmail("admin@test.io");
-        user.setPassword("123");
-        user.setPhone("88002000600");
-        user.setOs("android");
-        user.setEnabled(true);
-        user.setEmailConfirmed(true);
-        user.setBetBalance((long) 0);
-        user.setFreeBalance((long) 0);
-        user.setWithdrawalBalance((long) 0);
-        user.setRoles(new ArrayList<>());
-        user.addRole(rolesRepository.findByName("ROLE_USER"));
 
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        */
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
-                .param("email", "admin1@test.io")
+                .param("email", "user1@test.io")
                 .param("password", "123")
                 .param("phone", "88002000601")
                 .param("os", "android")
@@ -94,21 +71,36 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilExpired", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{methodName}", RequestDocumentation.requestParameters(
-                        RequestDocumentation.parameterWithName("email").description("Email пользователя"),
-                        RequestDocumentation.parameterWithName("password").description("Пароль пользователя"),
-                        RequestDocumentation.parameterWithName("phone").description("Номер телефона пользователя"),
-                        RequestDocumentation.parameterWithName("os").description("Используемая система пользователя"),
-                        RequestDocumentation.parameterWithName("viaEmail").description("Отправлять ли письмо на указанный Email").optional()
-                ), PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("error").description("Содержит код ошибки"),
-                        PayloadDocumentation.fieldWithPath("description").description("Содержит описание ошибки"),
-                        PayloadDocumentation.subsectionWithPath("data").description("Содержит данные запроса"),
-                        PayloadDocumentation.fieldWithPath("data['secondsUntilExpired']").description("Время, через которое истечет проверочный код"),
-                        PayloadDocumentation.fieldWithPath("data['secondsUntilResend']").description("Время, для повторного запроса проверочного кода"),
-                        PayloadDocumentation.fieldWithPath("data['attempts']").description("Число попыток для ввода проверочного кода")
-                )
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        RequestDocumentation.requestParameters(
+                            RequestDocumentation.parameterWithName("email")
+                                    .description("Email пользователя"),
+                            RequestDocumentation.parameterWithName("password")
+                                    .description("Пароль пользователя"),
+                            RequestDocumentation.parameterWithName("phone")
+                                    .description("Номер телефона пользователя"),
+                            RequestDocumentation.parameterWithName("os")
+                                    .description("Используемая система пользователя"),
+                            RequestDocumentation.parameterWithName("viaEmail")
+                                    .description("Отправлять ли письмо на указанный Email").optional()
+                        ),
+                        PayloadDocumentation.responseFields(
+                            PayloadDocumentation.fieldWithPath("error")
+                                    .description("Содержит код ошибки"),
+                            PayloadDocumentation.fieldWithPath("description")
+                                    .description("Содержит описание ошибки"),
+                            PayloadDocumentation.subsectionWithPath("data")
+                                    .description("Содержит данные запроса"),
+                            PayloadDocumentation.fieldWithPath("data['secondsUntilExpired']")
+                                    .description("Время, через которое истечет проверочный код"),
+                            PayloadDocumentation.fieldWithPath("data['secondsUntilResend']")
+                                    .description("Время, для повторного запроса проверочного кода"),
+                            PayloadDocumentation.fieldWithPath("data['attempts']")
+                                    .description("Число попыток для ввода проверочного кода")
+                        )
                 ))
+
+
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
         //verify(controllerService, times(1)).saveCheckCodeToEmail(anyString(), anyBoolean());
     }
@@ -118,8 +110,9 @@ class RegistrationControllerTest (
     @Order(3)
     @Throws(Exception::class)
     fun preRegistrationPostMethodTest() {
+
         val userDTO = UserDTO()
-        userDTO.email = "admin2@test.io"
+        userDTO.email = "user2@test.io"
         userDTO.password = "123"
         userDTO.phone = "88002000602"
         userDTO.os = "android"
@@ -127,7 +120,8 @@ class RegistrationControllerTest (
 
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-start")
                 .content(objectMapper.writeValueAsString(userDTO))
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+        )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
@@ -135,21 +129,36 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilExpired", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{methodName}", RequestDocumentation.requestParameters(
-                        RequestDocumentation.parameterWithName("email").description("Email пользователя"),
-                        RequestDocumentation.parameterWithName("password").description("Пароль пользователя"),
-                        RequestDocumentation.parameterWithName("phone").description("Номер телефона пользователя"),
-                        RequestDocumentation.parameterWithName("os").description("Используемая система пользователя"),
-                        RequestDocumentation.parameterWithName("viaEmail").description("Отправлять ли письмо на указанный Email").optional()
-                ), PayloadDocumentation.responseFields(
-                        PayloadDocumentation.fieldWithPath("error").description("Содержит код ошибки"),
-                        PayloadDocumentation.fieldWithPath("description").description("Содержит описание ошибки"),
-                        PayloadDocumentation.subsectionWithPath("data").description("Содержит данные запроса"),
-                        PayloadDocumentation.fieldWithPath("data['secondsUntilExpired']").description("Время, через которое истечет проверочный код"),
-                        PayloadDocumentation.fieldWithPath("data['secondsUntilResend']").description("Время, для повторного запроса проверочного кода"),
-                        PayloadDocumentation.fieldWithPath("data['attempts']").description("Число попыток для ввода проверочного кода")
-                )
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        PayloadDocumentation.relaxedRequestFields(
+                                PayloadDocumentation.fieldWithPath("email")
+                                        .description("Email пользователя"),
+                                PayloadDocumentation.fieldWithPath("password")
+                                        .description("Пароль пользователя"),
+                                PayloadDocumentation.fieldWithPath("phone")
+                                        .description("Номер телефона пользователя"),
+                                PayloadDocumentation.fieldWithPath("os")
+                                        .description("Используемая система пользователя"),
+                                PayloadDocumentation.fieldWithPath("viaEmail")
+                                        .description("Отправлять ли письмо на указанный Email").optional()
+                        ),
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error")
+                                        .description("Содержит код ошибки"),
+                                PayloadDocumentation.fieldWithPath("description")
+                                        .description("Содержит описание ошибки"),
+                                PayloadDocumentation.subsectionWithPath("data")
+                                        .description("Содержит данные запроса"),
+                                PayloadDocumentation.fieldWithPath("data['secondsUntilExpired']")
+                                        .description("Время, через которое истечет проверочный код"),
+                                PayloadDocumentation.fieldWithPath("data['secondsUntilResend']")
+                                        .description("Время, для повторного запроса проверочного кода"),
+                                PayloadDocumentation.fieldWithPath("data['attempts']")
+                                        .description("Число попыток для ввода проверочного кода")
+                        )
                 ))
+
+
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
     }
@@ -161,7 +170,7 @@ class RegistrationControllerTest (
     fun registrationConfirmGetMethodTest() {
 
         val mockUser: User = User()
-        mockUser.email = "admin1@test.io"
+        mockUser.email = "user1@test.io"
         mockUser.phone = "88002000601"
         mockUser.password = "123"
         mockUser.os = "android"
@@ -187,6 +196,34 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        RequestDocumentation.requestParameters(
+                                RequestDocumentation.parameterWithName("email")
+                                        .description("Email пользователя"),
+                                RequestDocumentation.parameterWithName("password")
+                                        .description("Пароль пользователя"),
+                                RequestDocumentation.parameterWithName("phone")
+                                        .description("Номер телефона пользователя"),
+                                RequestDocumentation.parameterWithName("os")
+                                        .description("Используемая система пользователя"),
+                                RequestDocumentation.parameterWithName("viaEmail")
+                                        .description("Отправлять ли письмо на указанный Email").optional(),
+                                RequestDocumentation.parameterWithName("code")
+                                        .description("Код подтверждения для регистрации, который приходит на указанный email")
+                        ),
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error")
+                                        .description("Содержит код ошибки"),
+                                PayloadDocumentation.fieldWithPath("description")
+                                        .description("Содержит описание ошибки"),
+                                PayloadDocumentation.subsectionWithPath("data")
+                                        .description("Содержит данные запроса"),
+                                PayloadDocumentation.fieldWithPath("data['session_id']")
+                                        .description("Содержит session_id, которую нужно сохранить, т.к. сессия будет хранится долго")
+                        )
+                ))
+
+
         //Mockito.verify(userRepository, VerificationModeFactory.times(1))?.save(ArgumentMatchers.any(User::class.java))
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
     }
@@ -196,16 +233,19 @@ class RegistrationControllerTest (
     @Order(4)
     @Throws(Exception::class)
     fun registrationConfirmPostMethodTest() {
+
+        // Пользователь для POST запроса, который преобразуется в JSON
         val mockUserDTO = UserDTO()
-        mockUserDTO.email = "admin2@test.io"
+        mockUserDTO.email = "user2@test.io"
         mockUserDTO.password = "123"
         mockUserDTO.phone = "88002000602"
         mockUserDTO.os = "android"
         mockUserDTO.isViaEmail = false
         mockUserDTO.code = "9999"
 
+        // Пользователь для возврата из базы в подмененном userRepository
         val mockUser: User = User()
-        mockUser.email = "admin1@test.io"
+        mockUser.email = "user1@test.io"
         mockUser.phone = "88002000601"
         mockUser.password = "123"
         mockUser.os = "android"
@@ -213,17 +253,47 @@ class RegistrationControllerTest (
         mockUser.emailConfirmed = true
         mockUser.roles.add(Roles("ROLE_USER"))
 
+        // Устанавливаем ловушку для возврата нашего пользователя
         Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
 
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-confirm")
                 .content(objectMapper.writeValueAsString(mockUserDTO))
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+        )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
+                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                        PayloadDocumentation.relaxedRequestFields(
+                                PayloadDocumentation.fieldWithPath("email")
+                                        .description("Email пользователя"),
+                                PayloadDocumentation.fieldWithPath("password")
+                                        .description("Пароль пользователя"),
+                                PayloadDocumentation.fieldWithPath("phone")
+                                        .description("Номер телефона пользователя"),
+                                PayloadDocumentation.fieldWithPath("os")
+                                        .description("Используемая система пользователя"),
+                                PayloadDocumentation.fieldWithPath("viaEmail")
+                                        .description("Отправлять ли письмо на указанный Email").optional(),
+                                PayloadDocumentation.fieldWithPath("code")
+                                        .description("Код подтверждения для регистрации, который приходит на указанный email")
+                        ),
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error")
+                                        .description("Содержит код ошибки"),
+                                PayloadDocumentation.fieldWithPath("description")
+                                        .description("Содержит описание ошибки"),
+                                PayloadDocumentation.subsectionWithPath("data")
+                                        .description("Содержит данные запроса"),
+                                PayloadDocumentation.fieldWithPath("data['session_id']")
+                                        .description("Содержит session_id, которую нужно сохранить, т.к. сессия будет хранится долго")
+                        )
+                ))
+
+
         //Mockito.verify(userRepository, VerificationModeFactory.times(1))!!.save(ArgumentMatchers.any(User::class.java))
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
     }

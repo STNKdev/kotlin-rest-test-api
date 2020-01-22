@@ -31,4 +31,4 @@ HELP.md
 # Gradle
 !gradle/wrapper
 /.gradle/
-/app.log
+/app.log*
