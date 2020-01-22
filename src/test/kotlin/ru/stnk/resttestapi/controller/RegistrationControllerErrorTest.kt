@@ -26,7 +26,7 @@ import java.util.*
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureRestDocs(outputDir = "build/generated/documentation")
+@AutoConfigureRestDocs(outputDir = "build/generated-snippets")
 class RegistrationControllerErrorTest (
         @Autowired val mockMvc: MockMvc
         //@Autowired val verificationCodeRepository: VerificationCodeRepository
@@ -70,7 +70,7 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(107)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Некорректный email")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
                         PayloadDocumentation.responseFields(description)
                 ))
     }
@@ -92,7 +92,7 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(108)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Пароль не должен совпадать с логином")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
                         PayloadDocumentation.responseFields(description)
                 ))
     }
@@ -114,7 +114,7 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(111)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Некорректный номер телефона")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
                         PayloadDocumentation.responseFields(description)
                 ))
     }
@@ -148,7 +148,7 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(106)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Пользователь существует")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
                         PayloadDocumentation.responseFields(description)
                 ))
 

@@ -20,7 +20,7 @@ class UserDTO {
     @Pattern(regexp = "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$", message = "Некорректный формат номера телефона")
     var phone: String = ""
 
-    @NotBlank
+    @NotBlank(message="Не должно быть пустым")
     var os: String = ""
 
     var isViaEmail: Boolean = false

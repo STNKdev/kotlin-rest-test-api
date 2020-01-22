@@ -68,11 +68,14 @@ dependencies {
 
 }
 
-val snippetsDir by extra { file("build/generated/documentation") }
-
-tasks.withType<Test> {
+/*tasks.withType<Test> {
 	useJUnitPlatform()
-	outputs.dir(snippetsDir)
+}*/
+
+// В телеграм чате gradle подсказали что без configureEach
+// будет создавать test задачи даже когда они не нужны
+/*tasks.withType<Test>().configureEach {
+	useJUnitPlatform()
 }
 
 tasks.withType<KotlinCompile> {
@@ -80,7 +83,7 @@ tasks.withType<KotlinCompile> {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
 		jvmTarget = "1.8"
 	}
-}
+}*/
 
 allOpen {
 	annotation("javax.persistence.Entity")
@@ -90,8 +93,29 @@ allOpen {
 
 tasks {
 
+	withType<Test>().configureEach {
+		useJUnitPlatform()
+	}
+
+	withType<KotlinCompile>().configureEach {
+		kotlinOptions {
+			freeCompilerArgs = listOf("-Xjsr305=strict")
+			jvmTarget = "1.8"
+		}
+	}
+
 	asciidoctor {
-		inputs.dir(snippetsDir)
-		dependsOn(test)
+
+		sourceDir = file("src/test/resources/docs")
+		/*sources(delegateClosureOf<PatternSet> {
+			include("toplevel.adoc", "another.adoc", "third.adoc")
+		})*/
+		outputDir = file("build/generated/docs")
+
+		attributes(
+			mapOf(
+				"snippets" to "build/generated-snippets"
+			)
+		)
 	}
 }

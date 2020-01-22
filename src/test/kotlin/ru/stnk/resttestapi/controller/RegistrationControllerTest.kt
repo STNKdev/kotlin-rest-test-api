@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
@@ -34,7 +35,7 @@ import ru.stnk.resttestapi.repository.UserRepository
 @AutoConfigureMockMvc
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@AutoConfigureRestDocs(outputDir = "build/generated/documentation")
+@AutoConfigureRestDocs(outputDir = "build/generated-snippets")
 class RegistrationControllerTest (
         @Autowired val mockMvc: MockMvc
 ) {
@@ -71,7 +72,7 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilExpired", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
                         RequestDocumentation.requestParameters(
                             RequestDocumentation.parameterWithName("email")
                                     .description("Email пользователя"),
@@ -129,8 +130,8 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilExpired", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
-                        PayloadDocumentation.relaxedRequestFields(
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
+                        PayloadDocumentation.requestFields(
                                 PayloadDocumentation.fieldWithPath("email")
                                         .description("Email пользователя"),
                                 PayloadDocumentation.fieldWithPath("password")
@@ -140,7 +141,8 @@ class RegistrationControllerTest (
                                 PayloadDocumentation.fieldWithPath("os")
                                         .description("Используемая система пользователя"),
                                 PayloadDocumentation.fieldWithPath("viaEmail")
-                                        .description("Отправлять ли письмо на указанный Email").optional()
+                                        .description("Отправлять ли письмо на указанный Email").optional(),
+                                PayloadDocumentation.fieldWithPath("code").ignored()
                         ),
                         PayloadDocumentation.responseFields(
                                 PayloadDocumentation.fieldWithPath("error")
@@ -150,9 +152,9 @@ class RegistrationControllerTest (
                                 PayloadDocumentation.subsectionWithPath("data")
                                         .description("Содержит данные запроса"),
                                 PayloadDocumentation.fieldWithPath("data['secondsUntilExpired']")
-                                        .description("Время, через которое истечет проверочный код"),
+                                        .description("Время через которое истечет проверочный код"),
                                 PayloadDocumentation.fieldWithPath("data['secondsUntilResend']")
-                                        .description("Время, для повторного запроса проверочного кода"),
+                                        .description("Время для повторного запроса проверочного кода"),
                                 PayloadDocumentation.fieldWithPath("data['attempts']")
                                         .description("Число попыток для ввода проверочного кода")
                         )
@@ -196,7 +198,7 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
                         RequestDocumentation.requestParameters(
                                 RequestDocumentation.parameterWithName("email")
                                         .description("Email пользователя"),
@@ -210,6 +212,10 @@ class RegistrationControllerTest (
                                         .description("Отправлять ли письмо на указанный Email").optional(),
                                 RequestDocumentation.parameterWithName("code")
                                         .description("Код подтверждения для регистрации, который приходит на указанный email")
+                        ),
+                        HeaderDocumentation.responseHeaders(
+                                HeaderDocumentation.headerWithName("Set-Cookie")
+                                        .description("Поле заголовка SESSION с ID авторизованной сессии, используется при последующих запросах")
                         ),
                         PayloadDocumentation.responseFields(
                                 PayloadDocumentation.fieldWithPath("error")
@@ -266,7 +272,7 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{methodName}",
+                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
                         PayloadDocumentation.relaxedRequestFields(
                                 PayloadDocumentation.fieldWithPath("email")
                                         .description("Email пользователя"),

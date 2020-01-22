@@ -12,8 +12,9 @@ import org.springframework.session.web.http.HttpSessionIdResolver
 //Из-за включенной аннотации не создаются таблицы Spring_Session
 //@EnableJdbcHttpSession
 class SessionConfig : AbstractHttpSessionApplicationInitializer() {
+
     /*@Bean
-    public HttpSessionIdResolver httpSessionIdResolver() {
+    fun httpSessionIdResolver(): HttpSessionIdResolver {
         return HeaderHttpSessionIdResolver.xAuthToken();
     }*/
 

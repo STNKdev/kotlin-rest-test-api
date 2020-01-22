@@ -1,5 +1,6 @@
 HELP.md
 !.mvn/wrapper/maven-wrapper.jar
+/src/main/resources/schema_session_postgresql.sql
 
 ### STS ###
 .apt_generated
