@@ -3,25 +3,32 @@ package ru.stnk.resttestapi.controller
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.entity.VerificationCode
 import ru.stnk.resttestapi.repository.VerificationCodeRepository
 import java.time.Instant
+import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs(outputDir = "build/generated/documentation")
 class RegistrationControllerErrorTest (
-        @Autowired val mockMvc: MockMvc,
-        @Autowired val verificationCodeRepository: VerificationCodeRepository
+        @Autowired val mockMvc: MockMvc
+        //@Autowired val verificationCodeRepository: VerificationCodeRepository
 ) {
     //    @MockBean
     //    private UserRepository userRepository;
@@ -35,12 +42,15 @@ class RegistrationControllerErrorTest (
         * 111 - неккоректный формат номера телефона
         * 112 - слишком рано был запрошен повторный вызов кода подтверждения
         * */
+    @MockBean
+    val verificationCodeRepository: VerificationCodeRepository? = null
+
     // Проверка неккоректного email
     @Test
     @Throws(Exception::class)
     fun notCorrectEmailError() {
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
-                .param("email", "admin1_test.io")
+                .param("email", "user1_test.io")
                 .param("password", "123")
                 .param("phone", "88002000601")
                 .param("os", "android")
@@ -59,8 +69,8 @@ class RegistrationControllerErrorTest (
     @Throws(Exception::class)
     fun equalLoginPasswordError() {
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
-                .param("email", "admin1@test.io")
-                .param("password", "admin1@test.io")
+                .param("email", "user1@test.io")
+                .param("password", "user1@test.io")
                 .param("phone", "88002000601")
                 .param("os", "android")
                 .param("viaEmail", "false")
@@ -78,7 +88,7 @@ class RegistrationControllerErrorTest (
     @Throws(Exception::class)
     fun checkNumberPhoneError() {
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
-                .param("email", "admin1@test.io")
+                .param("email", "user1@test.io")
                 .param("password", "123")
                 .param("phone", "+8(495) 302-66-88")
                 .param("os", "android")
@@ -96,20 +106,19 @@ class RegistrationControllerErrorTest (
     @Test
     @Throws(Exception::class)
     fun userExistError() {
-        /*
-        * Перед этим нужно добавить в таблицу user_verification_code запись с попытками,
-        * иначе вернется пустой ответ и тест провалится
-        * */
-        val verificationCode = VerificationCode(1234,
-                "admin@test.io",
+
+        val userEmail: String = "admin@test.io"
+
+        val verificationCode: VerificationCode = VerificationCode(1234,
+                userEmail,
                 60,
                 Instant.now().plusSeconds(300))
-        verificationCodeRepository.save(verificationCode)
-        // С не mock object в этих местах ошибки
-//when(verificationCodeRepository.save(verificationCode)).thenReturn(verificationCode);
-//verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
+
+        Mockito.`when`( verificationCodeRepository?.findByUserEmail(userEmail) ).thenReturn( Optional.of(verificationCode) )
+        //Mockito.`when`( verificationCodeRepository?.save( ArgumentMatchers.any(VerificationCode::class.java) ) ).thenReturn(verificationCode)
+
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-confirm")
-                .param("email", "admin@test.io")
+                .param("email", userEmail)
                 .param("password", "123")
                 .param("phone", "88002000600")
                 .param("os", "android")
@@ -122,8 +131,9 @@ class RegistrationControllerErrorTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(106)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Пользователь существует")))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
-        // И стираем запись обязательно
-        // а по логам сам стирает
-        //verificationCodeRepository.deleteById(verificationCode.getId());
+
+        Mockito.verify(verificationCodeRepository, Mockito.times(1))?.findByUserEmail(userEmail)
+        Mockito.verify(verificationCodeRepository, Mockito.times(0))?.save(verificationCode)
+
     }
 }

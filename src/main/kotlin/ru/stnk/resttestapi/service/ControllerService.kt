@@ -150,7 +150,7 @@ class ControllerService (
     @Throws(DelayException::class)
     fun saveCheckCodeToEmail(email: String, viaEmail: Boolean): MutableMap<String, Any> {
 
-        val verificationCodeFromDB = verificationCodeRepository.findByUserEmail(email)
+        val verificationCodeFromDB: Optional<VerificationCode> = verificationCodeRepository.findByUserEmail(email)
         val verificationCode: VerificationCode
         val data = HashMap<String, Any>()
         val requestTime = Instant.now()
