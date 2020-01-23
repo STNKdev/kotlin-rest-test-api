@@ -106,11 +106,11 @@ tasks {
 
 	asciidoctor {
 
-		sourceDir = file("src/test/resources/docs")
+		sourceDir = file("docs/templates")
 		/*sources(delegateClosureOf<PatternSet> {
 			include("toplevel.adoc", "another.adoc", "third.adoc")
 		})*/
-		outputDir = file("build/docs")
+		outputDir = file("docs/html5")
 
 		/*attributes(
 			mapOf(

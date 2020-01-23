@@ -35,7 +35,7 @@ import ru.stnk.resttestapi.repository.UserRepository
 @AutoConfigureMockMvc
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-@AutoConfigureRestDocs(outputDir = "build/generated-snippets")
+@AutoConfigureRestDocs
 class RegistrationControllerTest (
         @Autowired val mockMvc: MockMvc
 ) {
