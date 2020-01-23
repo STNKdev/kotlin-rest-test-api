@@ -5,4 +5,8 @@ No.
 We have something far worse.
 We're plagued by Wolpertingers.
 
-//include::{snippets}/preRegistrationGetMethodTest/curl-request.adoc[]
+include::{snippets}/registration-controller-test/pre-registration-get-method-test/http-request.adoc[]
+
+and
+
+include::{snippets}/registration-controller-test/pre-registration-get-method-test/request-parameters.adoc[]

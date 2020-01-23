@@ -1,7 +1,7 @@
 HELP.md
 !.mvn/wrapper/maven-wrapper.jar
 /src/main/resources/schema_session_postgresql.sql
-
+/__target/
 ### STS ###
 .apt_generated
 .classpath

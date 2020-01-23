@@ -110,12 +110,12 @@ tasks {
 		/*sources(delegateClosureOf<PatternSet> {
 			include("toplevel.adoc", "another.adoc", "third.adoc")
 		})*/
-		outputDir = file("build/generated/docs")
+		outputDir = file("build/docs")
 
-		attributes(
+		/*attributes(
 			mapOf(
-				"snippets" to "build/generated-snippets"
+				"snippets" to file("build/generated-snippets")
 			)
-		)
+		)*/
 	}
 }
