@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import ru.stnk.resttestapi.dto.UserDTO
+import ru.stnk.resttestapi.message.request.UserLoginForm
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.repository.RolesRepository
 import ru.stnk.resttestapi.repository.UserRepository
@@ -67,7 +67,7 @@ class ControllerServiceTest {
 
     @Test
     fun testRegisterNewUserAccount() {
-        val mockUser: UserDTO = UserDTO()
+        val mockUser: UserLoginForm = UserLoginForm()
         mockUser.email = "user@test.io"
         mockUser.phone = "88002000900"
         mockUser.password = "12345"

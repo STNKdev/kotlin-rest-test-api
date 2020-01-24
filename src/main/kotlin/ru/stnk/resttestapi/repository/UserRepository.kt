@@ -9,6 +9,7 @@ import java.util.*
 interface UserRepository : JpaRepository<User, Long> {
 
     fun findByEmail(email: String): Optional<User>
+    fun existsByEmail(email: String): Boolean
 
     /*@Query(value = "SELECT * FROM USERS WHERE EMAIL = ?1", nativeQuery = true)
     User findByUserEmail (String email);*/

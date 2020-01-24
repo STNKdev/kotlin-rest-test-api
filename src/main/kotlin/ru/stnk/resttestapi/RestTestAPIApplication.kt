@@ -2,6 +2,7 @@ package ru.stnk.resttestapi
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -11,7 +12,8 @@ import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.socket.client.WebSocketConnectionManager
 import org.springframework.web.socket.client.standard.StandardWebSocketClient
-import ru.stnk.resttestapi.entity.Roles
+import ru.stnk.resttestapi.entity.Role
+import ru.stnk.resttestapi.entity.RoleName
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.repository.RolesRepository
 import ru.stnk.resttestapi.repository.UserRepository
@@ -27,15 +29,18 @@ class RestTestAPIApplication {
 
     @Bean
     fun init(rolesRepository: RolesRepository, userRepository: UserRepository): CommandLineRunner {
+
         return CommandLineRunner {
+
             if (rolesRepository.findAll().isEmpty()) {
-                logger.info("Добавление роли Админа")
-                rolesRepository.save(Roles("ROLE_ADMIN"))
-                logger.info("Добавление роли Пользователя")
-                rolesRepository.save(Roles("ROLE_USER"))
+                logger.debug("Добавление роли Админа")
+                rolesRepository.save(Role(RoleName.ROLE_ADMIN))
+                logger.debug("Добавление роли Пользователя")
+                rolesRepository.save(Role(RoleName.ROLE_USER))
             }
-            if (!userRepository.findByEmail("admin@test.io").isPresent) {
-                logger.info("Добавление Админа")
+
+            if (userRepository.existsByEmail("admin@test.io")) {
+                logger.debug("Добавление Админа")
                 val admin = User()
                 admin.email = "admin@test.io"
                 admin.password = "123"
@@ -46,11 +51,12 @@ class RestTestAPIApplication {
                 admin.freeBalance = 999999
                 // Потому что свойство roles проинициализированно по умолчанию как ArrayList()
                 //admin.roles = ArrayList()
-                admin.roles.add(rolesRepository.findByName("ROLE_ADMIN"))
-                admin.roles.add(rolesRepository.findByName("ROLE_USER"))
+                admin.roles.add(rolesRepository.findByName(RoleName.ROLE_ADMIN))
+                admin.roles.add(rolesRepository.findByName(RoleName.ROLE_USER))
                 admin.betBalance = 0
                 admin.withdrawalBalance = 0
                 userRepository.save(admin)
+                logger.debug("Добавили админа")
             }
         }
     }

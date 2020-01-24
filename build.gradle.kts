@@ -77,13 +77,15 @@ dependencies {
 /*tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
 }
+*/
 
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
 		jvmTarget = "1.8"
+		encoding = "UTF-8"
 	}
-}*/
+}
 
 allOpen {
 	annotation("javax.persistence.Entity")
@@ -95,13 +97,6 @@ tasks {
 
 	withType<Test>().configureEach {
 		useJUnitPlatform()
-	}
-
-	withType<KotlinCompile>().configureEach {
-		kotlinOptions {
-			freeCompilerArgs = listOf("-Xjsr305=strict")
-			jvmTarget = "1.8"
-		}
 	}
 
 	asciidoctor {

@@ -11,8 +11,12 @@ import javax.persistence.*
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-@JsonIgnoreProperties(value = arrayOf("createdAt", "updatedAt"), allowGetters = true)
+@JsonIgnoreProperties(
+        value = arrayOf("createdAt", "updatedAt"),
+        allowGetters = true
+)
 abstract class AuditModel : Serializable {
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreatedDate

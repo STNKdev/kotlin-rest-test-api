@@ -3,7 +3,7 @@ package ru.stnk.resttestapi.controller
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
-import ru.stnk.resttestapi.dto.UserDTO
+import ru.stnk.resttestapi.message.request.UserLoginForm
 import ru.stnk.resttestapi.exception.registration.*
 import ru.stnk.resttestapi.results.RestResponse
 import ru.stnk.resttestapi.service.ControllerService
@@ -52,7 +52,7 @@ class RegistrationController (
             throw LoginPasswordEqualException()
         }
 
-        val userDTO = UserDTO()
+        val userDTO = UserLoginForm()
         userDTO.email = email
         userDTO.password = password
         userDTO.phone = phone
@@ -104,9 +104,9 @@ class RegistrationController (
 
     @PostMapping("/reg-start")
     @Throws(IncorrectEmailException::class, LoginPasswordEqualException::class, IncorrectPasswordException::class, IncorrectPhoneException::class, DelayException::class)
-    //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
+    //(@Valid @RequestBody final UserLoginForm requestBody, BindingResult bindingResult)
     fun preRegistrationPostMethod(
-            @Valid @RequestBody userDTO: UserDTO,
+            @Valid @RequestBody userLoginForm: UserLoginForm,
             bindingResult: BindingResult
     ): RestResponse {
 
@@ -114,7 +114,7 @@ class RegistrationController (
 
         //HashMap<String, Object> data = new HashMap<>();
 
-        if (userDTO.password == userDTO.email) {
+        if (userLoginForm.password == userLoginForm.email) {
             throw LoginPasswordEqualException()
         }
 
@@ -130,11 +130,11 @@ class RegistrationController (
             }
         }
 
-        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userLoginForm.getEmail()));
 
-        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
+        //controllerService.sendCheckCodeToEmail(userLoginForm.getEmail());
 
-        response.data = controllerService.saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
+        response.data = controllerService.saveCheckCodeToEmail(userLoginForm.email, userLoginForm.isViaEmail)
 
         return response
     }
@@ -167,7 +167,7 @@ class RegistrationController (
             throw LoginPasswordEqualException()
         }
 
-        val userDTO = UserDTO()
+        val userDTO = UserLoginForm()
         userDTO.email = email
         userDTO.password = password
         userDTO.phone = phone
@@ -216,9 +216,9 @@ class RegistrationController (
 
     @PostMapping("/reg-confirm")
     @Throws(IncorrectEmailException::class, LoginPasswordEqualException::class, IncorrectPasswordException::class, IncorrectPhoneException::class, DelayException::class, UserExistException::class)
-    //(@Valid @RequestBody final UserDTO requestBody, BindingResult bindingResult)
+    //(@Valid @RequestBody final UserLoginForm requestBody, BindingResult bindingResult)
     fun registrationConfirmPostMethod(
-            @Valid @RequestBody userDTO: UserDTO,
+            @Valid @RequestBody userLoginForm: UserLoginForm,
             bindingResult: BindingResult,
             request: HttpServletRequest
     ): RestResponse {
@@ -227,7 +227,7 @@ class RegistrationController (
 
         //HashMap<String, Object> data = new HashMap<>();
 
-        if (userDTO.password == userDTO.email) {
+        if (userLoginForm.password == userLoginForm.email) {
             throw LoginPasswordEqualException()
         }
 
@@ -243,11 +243,11 @@ class RegistrationController (
             }
         }
 
-        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userLoginForm.getEmail()));
 
-        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
+        //controllerService.sendCheckCodeToEmail(userLoginForm.getEmail());
 
-        response.data = controllerService.checkOfVerificationCode(userDTO, userDTO.code, request)
+        response.data = controllerService.checkOfVerificationCode(userLoginForm, userLoginForm.code, request)
 
         return response
     }

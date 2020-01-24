@@ -1,21 +1,21 @@
 package ru.stnk.resttestapi.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import org.springframework.security.core.GrantedAuthority
 import java.io.Serializable
 import javax.persistence.*
 
 @Entity
 @Table(name = "roles")
-class Roles : GrantedAuthority, Serializable {
+class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Id")
     var id: Long? = null
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "name")
-    var name: String = ""
+    var name: RoleName = RoleName.ROLE_USER
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
     @JsonIgnore
@@ -23,7 +23,7 @@ class Roles : GrantedAuthority, Serializable {
 
     constructor() {}
 
-    constructor(name: String) {
+    constructor(name: RoleName) {
         this.name = name
     }
 
@@ -39,7 +39,7 @@ class Roles : GrantedAuthority, Serializable {
         users!!.add(user)
     }*/
 
-    override fun getAuthority(): String? {
+    /*override fun getAuthority(): String? {
         return name
-    }
+    }*/
 }

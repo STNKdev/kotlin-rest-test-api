@@ -1,14 +1,15 @@
 package ru.stnk.resttestapi.service
 
 //import ru.stnk.resttestapi.configuration.SecurityConfig
-//import ru.stnk.resttestapi.entity.Roles
+//import ru.stnk.resttestapi.entity.RoleName
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.stnk.resttestapi.dto.UserDTO
+import ru.stnk.resttestapi.entity.RoleName
+import ru.stnk.resttestapi.message.request.UserLoginForm
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.entity.VerificationCode
 import ru.stnk.resttestapi.exception.registration.DelayException
@@ -49,39 +50,34 @@ class ControllerService (
 
     // Регистрируем нового пользователя
     @Throws(UserExistException::class)
-    fun registerNewUserAccount(userDTO: UserDTO): User {
-
-        if (userExists(userDTO.email)) {
-            throw UserExistException()
-        }
+    fun registerNewUserAccount(userLoginForm: UserLoginForm): User {
 
         val user = User()
-        user.email = userDTO.email
-        user.password = userDTO.password
-        user.phone = userDTO.phone
-        user.os = userDTO.os
+        user.email = userLoginForm.email
+        user.password = userLoginForm.password
+        user.phone = userLoginForm.phone
+        user.os = userLoginForm.os
         user.isEnabled = true
         user.emailConfirmed = true
         user.betBalance = 0
         user.freeBalance = 0
         user.withdrawalBalance =  0
-        user.roles.add(rolesRepository.findByName("ROLE_USER"))
+        user.roles.add(rolesRepository.findByName(RoleName.ROLE_USER))
 
         return repository.save(user)
     }
 
     //Проверка на существование пользователя с таким email
     /*private*/ fun userExists(email: String): Boolean {
-        val user: Optional<User> = repository.findByEmail(email)
-        return user.isPresent
+        return repository.existsByEmail(email)
     }
 
     // Сверка проверочного кода
     @Throws(UserExistException::class, DelayException::class)
-    fun checkOfVerificationCode(userDTO: UserDTO, checkCode: String, request: HttpServletRequest): Map<String, Any> {
+    fun checkOfVerificationCode(userLoginForm: UserLoginForm, checkCode: String, request: HttpServletRequest): Map<String, Any> {
 
         // Поиск пользователя по email в таблице проверочных кодов
-        val verificationCodeFromDB = verificationCodeRepository.findByUserEmail(userDTO.email)
+        val verificationCodeFromDB = verificationCodeRepository.findByUserEmail(userLoginForm.email)
 
         var data: MutableMap<String, Any> = HashMap()
 
@@ -98,14 +94,14 @@ class ControllerService (
                 // Удаляем строку с проверочным кодом
                 verificationCodeRepository.delete(verificationCode)
                 // Регистрируем нового пользователя
-                val newUser: User = registerNewUserAccount(userDTO)
+                val newUser: User = registerNewUserAccount(userLoginForm)
 
                 logger.info("Зарегистрирован новый пользователь id ${newUser.id} email: ${newUser.email}")
 
                 // Авторизовываем нового пользователя и возвращаем id сессии
                 try {
                     //request.changeSessionId();
-                    request.login(userDTO.email, userDTO.password)
+                    request.login(userLoginForm.email, userLoginForm.password)
                 } catch (ex: ServletException) {
                     // этот момент нужно залогировать
                     logger.debug("Ошибка при авторизации пользователя id: ${newUser.id} и email: ${newUser.email}" + ex.localizedMessage)
@@ -137,7 +133,7 @@ class ControllerService (
                     * и высылаем его на почту
                     */
                     verificationCodeRepository.delete(verificationCode)
-                    data = saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
+                    data = saveCheckCodeToEmail(userLoginForm.email, userLoginForm.isViaEmail)
                 }
             }
         }
@@ -154,6 +150,10 @@ class ControllerService (
         val verificationCode: VerificationCode
         val data = HashMap<String, Any>()
         val requestTime = Instant.now()
+
+        if (userExists(email)) {
+            throw UserExistException()
+        }
 
         if (verificationCodeFromDB.isPresent) {
 

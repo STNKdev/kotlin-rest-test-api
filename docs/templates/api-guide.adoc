@@ -1,0 +1,9 @@
+= Инструкция по применению API
+
+[[example_curl_request]]
+== Curl request
+include::{snippets}/registration-controller-test/pre-registration-get-method-test/http-request.adoc[]
+
+and
+
+include::{snippets}/registration-controller-test/pre-registration-get-method-test/request-parameters.adoc[]

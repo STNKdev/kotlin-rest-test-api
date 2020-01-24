@@ -2,7 +2,7 @@ package ru.stnk.resttestapi.service
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import ru.stnk.resttestapi.entity.Roles
+import ru.stnk.resttestapi.entity.RoleName
 import ru.stnk.resttestapi.entity.User
 import java.util.*
 
@@ -10,7 +10,7 @@ class UserDetailsImpl(private val user: User) : UserDetails {
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
 
-        val listRoles = ArrayList<Roles>()
+        val listRoles = ArrayList<RoleName>()
 
         val userRoles = user.roles
 

@@ -6,11 +6,17 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        uniqueConstraints = arrayOf(
+                UniqueConstraint(columnNames = ["email"]),
+                UniqueConstraint(columnNames = ["email"])
+        )
+)
 class User : AuditModel(), Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @JsonIgnore
     var id: Long? = null
@@ -57,14 +63,23 @@ class User : AuditModel(), Serializable {
 * почему?????!!!! Подумать над решением с fetch = FetchType.LAZY
 *
 * */
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles", joinColumns = arrayOf(JoinColumn(name = "user_id", referencedColumnName = "id"), JoinColumn(name = "user_email", referencedColumnName = "email")), inverseJoinColumns = arrayOf(JoinColumn(name = "role_id", referencedColumnName = "id"), JoinColumn(name = "role_name", referencedColumnName = "name")))
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = arrayOf(
+                    JoinColumn(name = "user_id", referencedColumnName = "id"),
+                    JoinColumn(name = "user_email", referencedColumnName = "email")
+            ),
+            inverseJoinColumns = arrayOf(
+                    JoinColumn(name = "role_id", referencedColumnName = "id"),
+                    JoinColumn(name = "role_name", referencedColumnName = "name")
+            )
+    )
     @JsonIgnore
-    var roles: MutableList<Roles> = ArrayList()
+    var roles: MutableList<Role> = ArrayList()
 
     private fun passwordEncoder(password: String): String {
-        val passwordEncoder = BCryptPasswordEncoder()
-        return passwordEncoder.encode(password)
+        return BCryptPasswordEncoder().encode(password)
     }
 
     /*fun getFreeBalance(): Long? {
@@ -91,15 +106,15 @@ class User : AuditModel(), Serializable {
         this.withdrawalBalance = withdrawalBalance!!
     }
 
-    fun getRoles(): List<Roles>? {
+    fun getRoles(): List<RoleName>? {
         return roles
     }
 
-    fun setRoles(roles: MutableList<Roles>) {
+    fun setRoles(roles: MutableList<RoleName>) {
         this.roles = roles
     }
 
-    fun addRole(name: Roles) {
+    fun addRole(name: RoleName) {
         roles.add(name)
     }*/
 }

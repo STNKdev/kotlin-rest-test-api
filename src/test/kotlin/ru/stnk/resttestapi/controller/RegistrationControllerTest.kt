@@ -16,17 +16,21 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.restdocs.constraints.ConstraintDescriptions
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
+import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.PayloadDocumentation
 import org.springframework.restdocs.request.RequestDocumentation
+import org.springframework.restdocs.snippet.Attributes
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import ru.stnk.resttestapi.dto.UserDTO
-import ru.stnk.resttestapi.entity.Roles
+import org.springframework.util.StringUtils
+import ru.stnk.resttestapi.message.request.UserLoginForm
+import ru.stnk.resttestapi.entity.RoleName
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.repository.UserRepository
 
@@ -49,13 +53,13 @@ class RegistrationControllerTest (
     // Выполняет код перед каждым тестом
     /*@Before
         public void init() {
-            rolesRepository.save(new Roles("ROLE_ADMIN"));
+            rolesRepository.save(new RoleName("ROLE_ADMIN"));
         }*/
     // Тест GET метода для получения кода подтверждения регистрации
     @Test
     @Order(1)
     @Throws(Exception::class)
-    fun preRegistrationGetMethodTest() {
+    fun preRegistrationGetMethod() {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
                 .param("email", "user1@test.io")
@@ -72,7 +76,7 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilExpired", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
+                .andDo(MockMvcRestDocumentation.document("{method-name}",
                         RequestDocumentation.requestParameters(
                             RequestDocumentation.parameterWithName("email")
                                     .description("Email пользователя"),
@@ -110,14 +114,16 @@ class RegistrationControllerTest (
     @Test
     @Order(3)
     @Throws(Exception::class)
-    fun preRegistrationPostMethodTest() {
+    fun preRegistrationPostMethod() {
 
-        val userDTO = UserDTO()
+        val userDTO = UserLoginForm()
         userDTO.email = "user2@test.io"
         userDTO.password = "123"
         userDTO.phone = "88002000602"
         userDTO.os = "android"
         userDTO.isViaEmail = false
+
+        val fields = ConstrainedFields(UserLoginForm::class.java)
 
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-start")
                 .content(objectMapper.writeValueAsString(userDTO))
@@ -130,19 +136,20 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilExpired", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
+                .andDo(MockMvcRestDocumentation.document("{method-name}",
+                        // PayloadDocumentation.fieldWithPath
                         PayloadDocumentation.requestFields(
-                                PayloadDocumentation.fieldWithPath("email")
+                                fields.withPath("email")
                                         .description("Email пользователя"),
-                                PayloadDocumentation.fieldWithPath("password")
+                                fields.withPath("password")
                                         .description("Пароль пользователя"),
-                                PayloadDocumentation.fieldWithPath("phone")
+                                fields.withPath("phone")
                                         .description("Номер телефона пользователя"),
-                                PayloadDocumentation.fieldWithPath("os")
+                                fields.withPath("os")
                                         .description("Используемая система пользователя"),
-                                PayloadDocumentation.fieldWithPath("viaEmail")
+                                fields.withPath("viaEmail")
                                         .description("Отправлять ли письмо на указанный Email").optional(),
-                                PayloadDocumentation.fieldWithPath("code").ignored()
+                                fields.withPath("code").ignored()
                         ),
                         PayloadDocumentation.responseFields(
                                 PayloadDocumentation.fieldWithPath("error")
@@ -169,7 +176,7 @@ class RegistrationControllerTest (
     @Test
     @Order(2)
     @Throws(Exception::class)
-    fun registrationConfirmGetMethodTest() {
+    fun registrationConfirmGetMethod() {
 
         val mockUser = User()
         mockUser.email = "user1@test.io"
@@ -178,7 +185,7 @@ class RegistrationControllerTest (
         mockUser.os = "android"
         mockUser.isEnabled = true
         mockUser.emailConfirmed = true
-        mockUser.roles.add(Roles("ROLE_USER"))
+        mockUser.roles.add(RoleName("ROLE_USER"))
 
         // Используем when().thenReturn(), чтобы при попытке сохранить пользователя нам вернули нашего пользователя
         // иначе будут ошибки ( repository.save(user) must not be null )
@@ -198,7 +205,7 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
+                .andDo(MockMvcRestDocumentation.document("{method-name}",
                         RequestDocumentation.requestParameters(
                                 RequestDocumentation.parameterWithName("email")
                                         .description("Email пользователя"),
@@ -229,7 +236,6 @@ class RegistrationControllerTest (
                         )
                 ))
 
-
         //Mockito.verify(userRepository, VerificationModeFactory.times(1))?.save(ArgumentMatchers.any(User::class.java))
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
     }
@@ -238,10 +244,10 @@ class RegistrationControllerTest (
     @Test
     @Order(4)
     @Throws(Exception::class)
-    fun registrationConfirmPostMethodTest() {
+    fun registrationConfirmPostMethod() {
 
         // Пользователь для POST запроса, который преобразуется в JSON
-        val mockUserDTO = UserDTO()
+        val mockUserDTO = UserLoginForm()
         mockUserDTO.email = "user2@test.io"
         mockUserDTO.password = "123"
         mockUserDTO.phone = "88002000602"
@@ -257,7 +263,7 @@ class RegistrationControllerTest (
         mockUser.os = "android"
         mockUser.isEnabled = true
         mockUser.emailConfirmed = true
-        mockUser.roles.add(Roles("ROLE_USER"))
+        mockUser.roles.add(RoleName("ROLE_USER"))
 
         // Устанавливаем ловушку для возврата нашего пользователя
         Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
@@ -272,8 +278,8 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
-                .andDo(MockMvcRestDocumentation.document("{class-name}/{method-name}",
-                        PayloadDocumentation.relaxedRequestFields(
+                .andDo(MockMvcRestDocumentation.document("{method-name}",
+                        PayloadDocumentation.requestFields(
                                 PayloadDocumentation.fieldWithPath("email")
                                         .description("Email пользователя"),
                                 PayloadDocumentation.fieldWithPath("password")
@@ -316,4 +322,24 @@ class RegistrationControllerTest (
         }
 
     }*/
+
+    private class ConstrainedFields (val input: Class<*>) {
+
+        val constraintDescriptions: ConstraintDescriptions = ConstraintDescriptions(input)
+
+        fun withPath(path: String): FieldDescriptor {
+            return PayloadDocumentation.fieldWithPath(path)
+                    .attributes(
+                            Attributes.key("constraints")
+                                    .value(
+                                            StringUtils.collectionToDelimitedString(
+                                                    constraintDescriptions.descriptionsForProperty(path), ". "
+                                            )
+                                    )
+                    )
+        }
+
+    }
+
+
 }
