@@ -5,6 +5,7 @@ import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class QuotationsScreenData {
+
     var pairs_data: Array<QuotationsPairsData>? = null
 
     override fun toString(): String {

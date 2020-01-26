@@ -9,7 +9,7 @@ import javax.persistence.*
 class VerificationCode {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
     @Column(name = "checkCode")

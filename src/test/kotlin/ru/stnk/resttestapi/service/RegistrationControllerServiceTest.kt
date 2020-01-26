@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import ru.stnk.resttestapi.message.request.UserLoginForm
+import ru.stnk.resttestapi.service.login.UserLoginForm
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.repository.RolesRepository
 import ru.stnk.resttestapi.repository.UserRepository
@@ -20,13 +20,13 @@ import kotlin.test.assertTrue
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
-class ControllerServiceTest {
+class RegistrationControllerServiceTest {
 
 //    @InjectMocks
-//    val controllerService: ControllerService? = null
+//    val registrationControllerService: RegistrationControllerService? = null
 
     @Autowired
-    val controllerService: ControllerService? = null
+    val registrationControllerService: RegistrationControllerService? = null
 
     @MockBean
     val userRepository: UserRepository? = null
@@ -57,7 +57,7 @@ class ControllerServiceTest {
         mockUser.password = "12345"
 
         `when`(userRepository?.findByEmail("user@test.io")).thenReturn(Optional.of(mockUser))
-        val isUserExist = controllerService?.userExists(mockUser.email)
+        val isUserExist = registrationControllerService?.userExists(mockUser.email)
 
         assertNotNull(isUserExist)
         assertTrue(isUserExist)
@@ -76,7 +76,7 @@ class ControllerServiceTest {
 
         `when`(userRepository?.save(ArgumentMatchers.any(User::class.java))).thenReturn(User())
 
-        val newUserAccount: User? = controllerService?.registerNewUserAccount(mockUser)
+        val newUserAccount: User? = registrationControllerService?.registerNewUserAccount(mockUser)
 
         assertNotNull(newUserAccount)
 

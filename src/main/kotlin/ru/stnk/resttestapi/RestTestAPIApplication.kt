@@ -2,7 +2,6 @@ package ru.stnk.resttestapi
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -39,7 +38,7 @@ class RestTestAPIApplication {
                 rolesRepository.save(Role(RoleName.ROLE_USER))
             }
 
-            if (userRepository.existsByEmail("admin@test.io")) {
+            if (userRepository.findByEmail("admin@test.io").isPresent) {
                 logger.debug("Добавление Админа")
                 val admin = User()
                 admin.email = "admin@test.io"

@@ -5,8 +5,10 @@ import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class QuotationsResponse {
+
     // data с котировками
     var data: Array<QuotationsData>? = null
+
     // URL для WebSocket соединений
     var zmq: Array<String>? = null
 

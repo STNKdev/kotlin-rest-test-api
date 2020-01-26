@@ -3,18 +3,19 @@ package ru.stnk.resttestapi.controller
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
-import ru.stnk.resttestapi.message.request.UserLoginForm
+import ru.stnk.resttestapi.service.login.UserLoginForm
 import ru.stnk.resttestapi.exception.registration.*
 import ru.stnk.resttestapi.results.RestResponse
-import ru.stnk.resttestapi.service.ControllerService
+import ru.stnk.resttestapi.service.RegistrationControllerService
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 import javax.validation.Validation
 
+@CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
 class RegistrationController (
-        @Autowired val controllerService: ControllerService
+        @Autowired val registrationControllerService: RegistrationControllerService
 ) {
 
     /*@Autowired
@@ -93,11 +94,11 @@ class RegistrationController (
             }
         }
 
-        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", registrationControllerService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
+        //registrationControllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.data = controllerService.saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
+        response.data = registrationControllerService.saveCheckCodeToEmail(userDTO.email, userDTO.isViaEmail)
 
         return response
     }
@@ -130,11 +131,11 @@ class RegistrationController (
             }
         }
 
-        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userLoginForm.getEmail()));
+        //data.put("checkCode", registrationControllerService.saveCheckCodeToEmail(userLoginForm.getEmail()));
 
-        //controllerService.sendCheckCodeToEmail(userLoginForm.getEmail());
+        //registrationControllerService.sendCheckCodeToEmail(userLoginForm.getEmail());
 
-        response.data = controllerService.saveCheckCodeToEmail(userLoginForm.email, userLoginForm.isViaEmail)
+        response.data = registrationControllerService.saveCheckCodeToEmail(userLoginForm.email, userLoginForm.isViaEmail)
 
         return response
     }
@@ -205,11 +206,11 @@ class RegistrationController (
             }
         }
 
-        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userDTO.getEmail()));
+        //data.put("checkCode", registrationControllerService.saveCheckCodeToEmail(userDTO.getEmail()));
 
-        //controllerService.sendCheckCodeToEmail(userDTO.getEmail());
+        //registrationControllerService.sendCheckCodeToEmail(userDTO.getEmail());
 
-        response.data = controllerService.checkOfVerificationCode(userDTO, code, request)
+        response.data = registrationControllerService.checkOfVerificationCode(userDTO, code, request)
 
         return response
     }
@@ -243,11 +244,11 @@ class RegistrationController (
             }
         }
 
-        //data.put("checkCode", controllerService.saveCheckCodeToEmail(userLoginForm.getEmail()));
+        //data.put("checkCode", registrationControllerService.saveCheckCodeToEmail(userLoginForm.getEmail()));
 
-        //controllerService.sendCheckCodeToEmail(userLoginForm.getEmail());
+        //registrationControllerService.sendCheckCodeToEmail(userLoginForm.getEmail());
 
-        response.data = controllerService.checkOfVerificationCode(userLoginForm, userLoginForm.code, request)
+        response.data = registrationControllerService.checkOfVerificationCode(userLoginForm, userLoginForm.code, request)
 
         return response
     }

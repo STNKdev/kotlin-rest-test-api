@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class QuotationsPairsData {
+
     var pair_ID: Int = 0
     var last: String? = null
     var change_percent_val: String? = null

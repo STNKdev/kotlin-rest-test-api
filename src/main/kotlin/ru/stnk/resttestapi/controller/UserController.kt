@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.stnk.resttestapi.results.RestResponse
-import ru.stnk.resttestapi.service.ControllerService
+import ru.stnk.resttestapi.service.RegistrationControllerService
 import java.security.Principal
 import java.util.*
 import javax.servlet.ServletException
@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest
 /*@Validated*/
 @RestController
 class UserController (
-        @Autowired val controllerService: ControllerService
+        @Autowired val registrationControllerService: RegistrationControllerService
 ) {
 
     /*@Autowired
@@ -43,7 +43,7 @@ class UserController (
 
         //Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        restResponse.data = controllerService.getUser(principal.name)
+        restResponse.data = registrationControllerService.getUser(principal.name)
 
         return restResponse
     }
@@ -56,9 +56,9 @@ class UserController (
 
         val restResponse = RestResponse()
 
-        //Session session = controllerService.registerUserSecurityContext(email, pass, request);
+        //Session session = registrationControllerService.registerUserSecurityContext(email, pass, request);
 
-        //httpServletResponse.setHeader("SET-COOKIE", "SESSION=" + session.getId()); //controllerService.registerUserSecurityContext(email, pass, request).toString();
+        //httpServletResponse.setHeader("SET-COOKIE", "SESSION=" + session.getId()); //registrationControllerService.registerUserSecurityContext(email, pass, request).toString();
 
         try {
             request.login(email, pass)
@@ -75,7 +75,7 @@ class UserController (
 
         restResponse.data = data
 
-        //restResponse.setData(controllerService.registerUserSecurityContext(email, pass, request));
+        //restResponse.setData(registrationControllerService.registerUserSecurityContext(email, pass, request));
 
         return restResponse
     }

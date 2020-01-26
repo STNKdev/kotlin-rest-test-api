@@ -6,10 +6,12 @@ package ru.stnk.resttestapi.service
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.stnk.resttestapi.configuration.jwt.JwtProvider
 import ru.stnk.resttestapi.entity.RoleName
-import ru.stnk.resttestapi.message.request.UserLoginForm
+import ru.stnk.resttestapi.service.login.UserLoginForm
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.entity.VerificationCode
 import ru.stnk.resttestapi.exception.registration.DelayException
@@ -27,11 +29,13 @@ import javax.servlet.http.HttpServletRequest
 
 @Service
 @Transactional
-class ControllerService (
+class RegistrationControllerService (
         @Autowired val repository: UserRepository,
         @Autowired val rolesRepository: RolesRepository,
         @Autowired val verificationCodeRepository: VerificationCodeRepository,
-        @Autowired val mailSender: MailSender
+        @Autowired val mailSender: MailSender,
+        @Autowired val authenticationManager: AuthenticationManager,
+        @Autowired val jwtProvider: JwtProvider
 ) {
 
     /*@Autowired
@@ -40,7 +44,7 @@ class ControllerService (
     @Autowired
     private val userDetailsService: UserDetailsServiceImpl? = null*/
 
-    private val logger: Logger = LoggerFactory.getLogger(ControllerService::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(RegistrationControllerService::class.java)
 
     private val expiryTime = 300
 

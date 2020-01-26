@@ -5,22 +5,24 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import ru.stnk.resttestapi.repository.UserRepository
 
 @Service
 class UserDetailsServiceImpl : UserDetailsService {
 
     @Autowired
-    private val userRepository: UserRepository? = null
+    val userRepository: UserRepository? = null
 
+    @Transactional
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(email: String): UserDetails {
 
         val userFromDB = userRepository!!.findByEmail(email)
 
-        return if (userFromDB.isPresent) {
+        if (userFromDB.isPresent) {
 
-            UserDetailsImpl(userFromDB.get())
+            return UserDetailsImpl.build(userFromDB.get())
 
         } else {
             throw UsernameNotFoundException(email)

@@ -34,7 +34,7 @@ class RegistrationControllerErrorTest (
     //    @MockBean
     //    private UserRepository userRepository;
     //    @InjectMocks
-    //    private ControllerService controllerService;
+    //    private RegistrationControllerService registrationControllerService;
     /*
         * Тесты возможных регистрационных ошибок:
         * 106 - пользователь существует

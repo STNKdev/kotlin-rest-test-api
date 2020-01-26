@@ -9,17 +9,18 @@ import javax.persistence.*
 class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "Id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     var id: Long? = null
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name")
-    var name: RoleName = RoleName.ROLE_USER
+    var name: RoleName? = null
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
-    @JsonIgnore
-    private var users: MutableList<User> = ArrayList()
+    //@ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
+    //@JsonIgnore
+    //private var users: MutableList<User> = ArrayList()
+    //var users: Set<User> = HashSet()
 
     constructor() {}
 

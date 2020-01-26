@@ -1,4 +1,4 @@
-package ru.stnk.resttestapi.message.request
+package ru.stnk.resttestapi.service.login
 
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank

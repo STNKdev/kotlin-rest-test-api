@@ -1,7 +1,8 @@
-package ru.stnk.resttestapi.configuration
+package ru.stnk.resttestapi.configuration.jwt
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.LoggerFactory
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
@@ -12,6 +13,9 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class RestAuthenticationEntryPoint : AuthenticationEntryPoint {
+
+    private val logger = LoggerFactory.getLogger(RestAuthenticationEntryPoint::class.java)
+
     @Throws(IOException::class)
     override fun commence(
             request: HttpServletRequest,
@@ -25,9 +29,11 @@ class RestAuthenticationEntryPoint : AuthenticationEntryPoint {
                 "Необходима аутентификация.")
 
         try {
+            logger.error("Unauthorized error. Message - {}", authException.message)
             response.writer.print(ObjectMapper().writeValueAsString(restResponse))
         } catch (ex: JsonProcessingException) {
-            response.writer.print(ex.toString())
+            logger.error("JsonProcessingException. Message - {}", ex.toString())
+            //response.writer.print(ex.toString())
         }
 
         response.writer.flush()

@@ -46,7 +46,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	//runtimeOnly("com.h2database:h2")
 	// Spring Session
-	implementation("org.springframework.session:spring-session-jdbc")
+	//implementation("org.springframework.session:spring-session-jdbc")
 	// PostgreSQL
 	runtimeOnly("org.postgresql:postgresql")
 	// Test dependencies and Spring Test
@@ -66,6 +66,9 @@ dependencies {
 	// Flyway
 	implementation("org.flywaydb:flyway-core")
 
+	// JWT
+	implementation("io.jsonwebtoken:jjwt:0.9.0")
+
 }
 
 /*tasks.withType<Test> {
@@ -83,7 +86,7 @@ tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
 		jvmTarget = "1.8"
-		encoding = "UTF-8"
+		//encoding = "UTF-8"
 	}
 }
 

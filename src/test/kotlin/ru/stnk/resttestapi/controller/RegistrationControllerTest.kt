@@ -29,7 +29,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.util.StringUtils
-import ru.stnk.resttestapi.message.request.UserLoginForm
+import ru.stnk.resttestapi.entity.Role
+import ru.stnk.resttestapi.service.login.UserLoginForm
 import ru.stnk.resttestapi.entity.RoleName
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.repository.UserRepository
@@ -107,7 +108,7 @@ class RegistrationControllerTest (
 
 
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
-        //verify(controllerService, times(1)).saveCheckCodeToEmail(anyString(), anyBoolean());
+        //verify(registrationControllerService, times(1)).saveCheckCodeToEmail(anyString(), anyBoolean());
     }
 
     // Тест POST метода для получения кода подтверждения регистрации
@@ -116,17 +117,17 @@ class RegistrationControllerTest (
     @Throws(Exception::class)
     fun preRegistrationPostMethod() {
 
-        val userDTO = UserLoginForm()
-        userDTO.email = "user2@test.io"
-        userDTO.password = "123"
-        userDTO.phone = "88002000602"
-        userDTO.os = "android"
-        userDTO.isViaEmail = false
+        val userLoginForm = UserLoginForm()
+        userLoginForm.email = "user2@test.io"
+        userLoginForm.password = "123"
+        userLoginForm.phone = "88002000602"
+        userLoginForm.os = "android"
+        userLoginForm.isViaEmail = false
 
         val fields = ConstrainedFields(UserLoginForm::class.java)
 
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-start")
-                .content(objectMapper.writeValueAsString(userDTO))
+                .content(objectMapper.writeValueAsString(userLoginForm))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
         )
                 .andDo(MockMvcResultHandlers.print())
@@ -185,7 +186,7 @@ class RegistrationControllerTest (
         mockUser.os = "android"
         mockUser.isEnabled = true
         mockUser.emailConfirmed = true
-        mockUser.roles.add(RoleName("ROLE_USER"))
+        mockUser.roles.add( Role(RoleName.ROLE_USER) )
 
         // Используем when().thenReturn(), чтобы при попытке сохранить пользователя нам вернули нашего пользователя
         // иначе будут ошибки ( repository.save(user) must not be null )
@@ -247,13 +248,13 @@ class RegistrationControllerTest (
     fun registrationConfirmPostMethod() {
 
         // Пользователь для POST запроса, который преобразуется в JSON
-        val mockUserDTO = UserLoginForm()
-        mockUserDTO.email = "user2@test.io"
-        mockUserDTO.password = "123"
-        mockUserDTO.phone = "88002000602"
-        mockUserDTO.os = "android"
-        mockUserDTO.isViaEmail = false
-        mockUserDTO.code = "9999"
+        val mockUserLoginForm = UserLoginForm()
+        mockUserLoginForm.email = "user2@test.io"
+        mockUserLoginForm.password = "123"
+        mockUserLoginForm.phone = "88002000602"
+        mockUserLoginForm.os = "android"
+        mockUserLoginForm.isViaEmail = false
+        mockUserLoginForm.code = "9999"
 
         // Пользователь для возврата из базы в подмененном userRepository
         val mockUser = User()
@@ -263,13 +264,13 @@ class RegistrationControllerTest (
         mockUser.os = "android"
         mockUser.isEnabled = true
         mockUser.emailConfirmed = true
-        mockUser.roles.add(RoleName("ROLE_USER"))
+        mockUser.roles.add( Role(RoleName.ROLE_USER) )
 
         // Устанавливаем ловушку для возврата нашего пользователя
         Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
 
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-confirm")
-                .content(objectMapper.writeValueAsString(mockUserDTO))
+                .content(objectMapper.writeValueAsString(mockUserLoginForm))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
         )
                 .andDo(MockMvcResultHandlers.print())
@@ -323,7 +324,7 @@ class RegistrationControllerTest (
 
     }*/
 
-    private class ConstrainedFields (val input: Class<*>) {
+    private class ConstrainedFields (input: Class<*>) {
 
         val constraintDescriptions: ConstraintDescriptions = ConstraintDescriptions(input)
 
