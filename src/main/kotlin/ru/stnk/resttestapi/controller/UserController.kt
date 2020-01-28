@@ -45,6 +45,8 @@ class UserController (
 
         restResponse.data = registrationControllerService.getUser(principal.name)
 
+        //restResponse.data = principal
+
         return restResponse
     }
 

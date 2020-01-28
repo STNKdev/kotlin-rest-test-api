@@ -6,11 +6,11 @@ import javax.validation.constraints.Size
 
 class LoginForm {
 
-    @NotBlank
+    @NotBlank(message = "Не должно быть пустым")
     @Email(message = "Некорректный email")
     var email: String? = null
 
-    @NotBlank
+    @NotBlank(message = "Не должно быть пустым")
     @Size(min = 3, message = "Длина пароля должна быть не меньше трёх символов")
     var password: String? = null
 }

@@ -1,5 +1,5 @@
 !.mvn/wrapper/maven-wrapper.jar
-/schema_session_postgresql.sql
+/schema_rest_db_postgresql.sql
 /__target/
 ### STS ###
 .apt_generated
@@ -32,3 +32,4 @@
 !gradle/wrapper
 /.gradle/
 /app.log*
+/schema_rest_db_postgresql.sql
