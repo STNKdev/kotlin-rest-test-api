@@ -3,10 +3,10 @@ package ru.stnk.resttestapi.controller
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
-import ru.stnk.resttestapi.service.login.UserLoginForm
 import ru.stnk.resttestapi.exception.registration.*
 import ru.stnk.resttestapi.results.RestResponse
 import ru.stnk.resttestapi.service.RegistrationControllerService
+import ru.stnk.resttestapi.service.login.UserLoginForm
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
@@ -149,7 +149,14 @@ class RegistrationController (
 
 
     @GetMapping("/reg-confirm")
-    @Throws(IncorrectEmailException::class, LoginPasswordEqualException::class, IncorrectPasswordException::class, IncorrectPhoneException::class, DelayException::class, UserExistException::class)
+    @Throws(
+            IncorrectEmailException::class,
+            LoginPasswordEqualException::class,
+            IncorrectPasswordException::class,
+            IncorrectPhoneException::class,
+            DelayException::class,
+            UserExistException::class
+    )
     fun registrationConfirmGetMethod(
             @RequestParam email: String,
             @RequestParam password: String,
@@ -190,20 +197,25 @@ class RegistrationController (
          * violation.getMessage() - возвращает сообщение об ошибке
          * violation.getInvalidValue() - возвращает значение из-за которого возникла ошибка
          * */
-        if (!violations.isEmpty()) {
+        if (violations.isNotEmpty()) {
 
             val errors = HashMap<String, String>()
             for (violation in violations) {
                 errors[violation.propertyPath.toString()] = violation.message
             }
 
-            if (errors.containsKey("email")) {
+            when {
+                errors.containsKey("email") -> throw IncorrectEmailException()
+                errors.containsKey("password") -> throw IncorrectPasswordException()
+                errors.containsKey("phone") -> throw IncorrectPhoneException()
+            }
+            /*if (errors.containsKey("email")) {
                 throw IncorrectEmailException()
             } else if (errors.containsKey("password")) {
                 throw IncorrectPasswordException()
             } else if (errors.containsKey("phone")) {
                 throw IncorrectPhoneException()
-            }
+            }*/
         }
 
         //data.put("checkCode", registrationControllerService.saveCheckCodeToEmail(userDTO.getEmail()));

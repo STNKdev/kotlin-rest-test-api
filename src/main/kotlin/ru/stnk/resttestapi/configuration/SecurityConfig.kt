@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import ru.stnk.resttestapi.configuration.jwt.JwtAuthTokenFilter
 import ru.stnk.resttestapi.configuration.jwt.RestAuthenticationEntryPoint
 //import org.springframework.session.security.web.authentication.SpringSessionRememberMeServices
-import ru.stnk.resttestapi.service.UserDetailsServiceImpl
+import ru.stnk.resttestapi.service.user.UserDetailsServiceImpl
 
 @Configuration
 @EnableWebSecurity
@@ -112,7 +112,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .antMatchers("/reg-confirm").permitAll()
                 //.antMatchers(HttpMethod.GET, "/add-role").permitAll()
                 //.antMatchers(HttpMethod.GET, HttpMethod.POST, "/login").permitAll()
-                .antMatchers(HttpMethod.GET, "/auth").permitAll()
+                //.antMatchers(HttpMethod.GET, "/auth").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/currtime").permitAll()
                 .antMatchers(HttpMethod.GET, "/quotations").permitAll()

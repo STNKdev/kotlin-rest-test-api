@@ -1,4 +1,4 @@
-package ru.stnk.resttestapi.service
+package ru.stnk.resttestapi.service.user
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority

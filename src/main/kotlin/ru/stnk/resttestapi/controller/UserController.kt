@@ -48,7 +48,7 @@ class UserController (
         return restResponse
     }
 
-    @GetMapping("/auth")
+    /*@GetMapping("/auth")
     @Throws(ServletException::class, BadCredentialsException::class)
     fun getAuth(@RequestParam email: String,
                 @RequestParam pass: String,
@@ -78,6 +78,6 @@ class UserController (
         //restResponse.setData(registrationControllerService.registerUserSecurityContext(email, pass, request));
 
         return restResponse
-    }
+    }*/
 
 }

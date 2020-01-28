@@ -6,14 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.WebSocketHandler
 import org.springframework.web.socket.WebSocketMessage
 import org.springframework.web.socket.WebSocketSession
-import org.springframework.web.socket.client.WebSocketConnectionManager
 import ru.stnk.resttestapi.entity.coins.InstrumentEntity
 import ru.stnk.resttestapi.entity.coins.QuoteBinFiveMinute
 import ru.stnk.resttestapi.entity.coins.QuoteBinOneMinute
@@ -38,7 +36,7 @@ class SimpleWsHandler : WebSocketHandler {
 
     private val mapper = ObjectMapper()
 
-    private val context: ApplicationContext? = null
+    //private val context: ApplicationContext? = null
 
     private val logger: Logger = LoggerFactory.getLogger(SimpleWsHandler::class.java)
 
@@ -55,8 +53,6 @@ class SimpleWsHandler : WebSocketHandler {
      */
     @Throws(Exception::class)
     override fun handleMessage(session: WebSocketSession, message: WebSocketMessage<*>) {
-        //System.out.println(message.getPayload());
-
         saveMessage(message.payload)
     }
 
@@ -74,14 +70,13 @@ class SimpleWsHandler : WebSocketHandler {
     @Throws(Exception::class)
     override fun afterConnectionClosed(session: WebSocketSession, closeStatus: CloseStatus) {
         logger.info("Соединение закрывается")
-        logger.info("Попытка перезапустить соединение")
+        /*logger.info("Попытка перезапустить соединение")
         val wsConnectionManager: WebSocketConnectionManager = context?.getBean("wsConnectionManager") as WebSocketConnectionManager
         wsConnectionManager.start()
-        if (wsConnectionManager.isRunning) logger.info("Перезапуск соединения успешен")
+        if (wsConnectionManager.isRunning) logger.info("Перезапуск соединения успешен")*/
     }
 
     override fun supportsPartialMessages(): Boolean {
-        // TODO Auto-generated method stub
         return false
     }
 

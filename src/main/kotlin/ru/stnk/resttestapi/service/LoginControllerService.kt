@@ -9,8 +9,8 @@ import ru.stnk.resttestapi.configuration.jwt.JwtProvider
 
 @Service
 class LoginControllerService (
-        @Autowired val authenticationManager: AuthenticationManager,
-        @Autowired val jwtProvider: JwtProvider
+        @Autowired private val authenticationManager: AuthenticationManager,
+        @Autowired private val jwtProvider: JwtProvider
 ) {
     fun authenticateUser(email: String, password: String): String {
         val authentication = authenticationManager.authenticate(

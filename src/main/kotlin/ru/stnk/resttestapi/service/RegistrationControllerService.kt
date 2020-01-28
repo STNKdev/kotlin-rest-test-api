@@ -1,17 +1,11 @@
 package ru.stnk.resttestapi.service
 
-//import ru.stnk.resttestapi.configuration.SecurityConfig
-//import ru.stnk.resttestapi.entity.RoleName
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.stnk.resttestapi.configuration.jwt.JwtProvider
 import ru.stnk.resttestapi.entity.RoleName
-import ru.stnk.resttestapi.service.login.UserLoginForm
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.entity.VerificationCode
 import ru.stnk.resttestapi.exception.registration.DelayException
@@ -19,23 +13,22 @@ import ru.stnk.resttestapi.exception.registration.UserExistException
 import ru.stnk.resttestapi.repository.RolesRepository
 import ru.stnk.resttestapi.repository.UserRepository
 import ru.stnk.resttestapi.repository.VerificationCodeRepository
+import ru.stnk.resttestapi.service.login.UserLoginForm
 import java.time.Duration
 import java.time.Instant
 import java.util.*
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
+import kotlin.collections.HashMap
 
-//import java.util.Optional
 
 @Service
-@Transactional
 class RegistrationControllerService (
-        @Autowired val repository: UserRepository,
-        @Autowired val rolesRepository: RolesRepository,
-        @Autowired val verificationCodeRepository: VerificationCodeRepository,
-        @Autowired val mailSender: MailSender,
-        @Autowired val authenticationManager: AuthenticationManager,
-        @Autowired val jwtProvider: JwtProvider
+        @Autowired private val userRepository: UserRepository,
+        @Autowired private val rolesRepository: RolesRepository,
+        @Autowired private val verificationCodeRepository: VerificationCodeRepository,
+        @Autowired private val mailSender: MailSender,
+        @Autowired private val loginControllerService: LoginControllerService
 ) {
 
     /*@Autowired
@@ -53,8 +46,14 @@ class RegistrationControllerService (
     private val confirmCode = 9999
 
     // Регистрируем нового пользователя
+    @Transactional
     @Throws(UserExistException::class)
     fun registerNewUserAccount(userLoginForm: UserLoginForm): User {
+
+        // Проверяем нет ли такого пользователя
+        if (userExists(userLoginForm.email)) {
+            throw UserExistException()
+        }
 
         val user = User()
         user.email = userLoginForm.email
@@ -68,17 +67,22 @@ class RegistrationControllerService (
         user.withdrawalBalance =  0
         user.roles.add(rolesRepository.findByName(RoleName.ROLE_USER))
 
-        return repository.save(user)
+        return userRepository.save(user)
     }
 
     //Проверка на существование пользователя с таким email
     /*private*/ fun userExists(email: String): Boolean {
-        return repository.existsByEmail(email)
+        return userRepository.existsByEmail(email)
     }
 
     // Сверка проверочного кода
+    @Transactional
     @Throws(UserExistException::class, DelayException::class)
-    fun checkOfVerificationCode(userLoginForm: UserLoginForm, checkCode: String, request: HttpServletRequest): Map<String, Any> {
+    fun checkOfVerificationCode(
+            userLoginForm: UserLoginForm,
+            checkCode: String,
+            request: HttpServletRequest
+    ): Map<String, Any> {
 
         // Поиск пользователя по email в таблице проверочных кодов
         val verificationCodeFromDB = verificationCodeRepository.findByUserEmail(userLoginForm.email)
@@ -97,22 +101,24 @@ class RegistrationControllerService (
 
                 // Удаляем строку с проверочным кодом
                 verificationCodeRepository.delete(verificationCode)
+
                 // Регистрируем нового пользователя
                 val newUser: User = registerNewUserAccount(userLoginForm)
 
-                logger.info("Зарегистрирован новый пользователь id ${newUser.id} email: ${newUser.email}")
+                logger.info("Зарегистрирован новый пользователь id ${newUser.id} & email: ${newUser.email}")
 
                 // Авторизовываем нового пользователя и возвращаем id сессии
                 try {
                     //request.changeSessionId();
-                    request.login(userLoginForm.email, userLoginForm.password)
+                    //request.login(userLoginForm.email, userLoginForm.password)
+                    data["api-key"] = loginControllerService.authenticateUser(userLoginForm.email, userLoginForm.password)
+                    logger.debug("Аутентифицирован пользователь id ${newUser.id} & email: ${newUser.email}")
                 } catch (ex: ServletException) {
-                    // этот момент нужно залогировать
-                    logger.debug("Ошибка при авторизации пользователя id: ${newUser.id} и email: ${newUser.email}" + ex.localizedMessage)
+                    logger.debug("Ошибка при аутентификации пользователя id: ${newUser.id} & email: ${newUser.email} >>>" + ex.localizedMessage)
                 }
 
-                data["session_id"] = request.session.id
-                return data
+                // Концепция поменялась - сессия уже не нужна
+                //data["session_id"] = request.session.id
 
             } else {
 
@@ -147,6 +153,7 @@ class RegistrationControllerService (
     }
 
     // Генерация проверочного кода и сохранение его в базу
+    @Transactional
     @Throws(DelayException::class)
     fun saveCheckCodeToEmail(email: String, viaEmail: Boolean): MutableMap<String, Any> {
 
@@ -227,7 +234,7 @@ class RegistrationControllerService (
 
     fun getUser(email: String): User? {
 
-        val userFromDB = repository.findByEmail(email)
+        val userFromDB = userRepository.findByEmail(email)
 
         return if (userFromDB.isPresent) {
             userFromDB.get()

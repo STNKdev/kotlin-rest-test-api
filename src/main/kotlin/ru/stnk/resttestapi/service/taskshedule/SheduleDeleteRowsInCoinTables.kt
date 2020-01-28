@@ -1,24 +1,29 @@
-package ru.stnk.resttestapi.service
-
+package ru.stnk.resttestapi.service.taskshedule
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import ru.stnk.resttestapi.repository.QuoteBinFiveMinuteRepository
 import ru.stnk.resttestapi.repository.QuoteBinOneMinuteRepository
 
+
 @Component
-class SheduleDeleteRowsInCoinTables {
-    @Autowired
+@EnableScheduling
+class SheduleDeleteRowsInCoinTables (
+        @Autowired val quoteBinOneMinuteRepository: QuoteBinOneMinuteRepository,
+        @Autowired val quoteBinFiveMinuteRepository: QuoteBinFiveMinuteRepository
+) {
+    /*@Autowired
     private val quoteBinOneMinuteRepository: QuoteBinOneMinuteRepository? = null
 
     @Autowired
-    private val quoteBinFiveMinuteRepository: QuoteBinFiveMinuteRepository? = null
+    private val quoteBinFiveMinuteRepository: QuoteBinFiveMinuteRepository? = null*/
 
     @Scheduled(fixedDelay = 60000)
     fun deleteRows() {
-        val oneMinuteList = quoteBinOneMinuteRepository!!.findAll()
-        val fiveMinuteList = quoteBinFiveMinuteRepository!!.findAll()
+        val oneMinuteList = quoteBinOneMinuteRepository.findAll()
+        val fiveMinuteList = quoteBinFiveMinuteRepository.findAll()
 
         if (oneMinuteList.size > 500) {
             for (i in 0 until oneMinuteList.size - 499) {

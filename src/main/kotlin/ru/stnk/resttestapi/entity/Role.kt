@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "roles")
-class Role {
+class Role: Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,9 +17,9 @@ class Role {
     @Column(name = "name")
     var name: RoleName? = null
 
-    //@ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
-    //@JsonIgnore
-    //private var users: MutableList<User> = ArrayList()
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
+    @JsonIgnore
+    private var users: MutableList<User> = ArrayList()
     //var users: Set<User> = HashSet()
 
     constructor() {}

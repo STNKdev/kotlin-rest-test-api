@@ -63,7 +63,7 @@ class User : AuditModel(), Serializable {
 * почему?????!!!! Подумать над решением с fetch = FetchType.LAZY
 *
 * */
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
             joinColumns = arrayOf(

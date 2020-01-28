@@ -2,6 +2,7 @@ package ru.stnk.resttestapi.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.hamcrest.Matchers
+import org.junit.Before
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
@@ -16,24 +17,25 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
-import org.springframework.restdocs.constraints.ConstraintDescriptions
 import org.springframework.restdocs.headers.HeaderDocumentation
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.PayloadDocumentation
+import org.springframework.restdocs.payload.RequestFieldsSnippet
 import org.springframework.restdocs.request.RequestDocumentation
-import org.springframework.restdocs.snippet.Attributes
+import org.springframework.restdocs.request.RequestParametersSnippet
+import org.springframework.restdocs.snippet.Attributes.key
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.util.StringUtils
 import ru.stnk.resttestapi.entity.Role
 import ru.stnk.resttestapi.service.login.UserLoginForm
 import ru.stnk.resttestapi.entity.RoleName
 import ru.stnk.resttestapi.entity.User
 import ru.stnk.resttestapi.repository.UserRepository
+
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
@@ -46,16 +48,81 @@ class RegistrationControllerTest (
 ) {
 
     // Подменяем репозиторий, чтобы в базу не ходил и не создавал нам там пользователей
-    @MockBean
-    val userRepository: UserRepository? = null
+    /*@MockBean
+    val userRepository: UserRepository? = null*/
 
     private val objectMapper = ObjectMapper()
 
+    private val requestDocumentationParameters: RequestParametersSnippet = RequestDocumentation.requestParameters(
+            RequestDocumentation.parameterWithName("email")
+                    .description("Email пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым. Проверяется на корректность.")),
+            RequestDocumentation.parameterWithName("password")
+                    .description("Пароль пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым. Минимальная длина 3 символа.")),
+            RequestDocumentation.parameterWithName("phone")
+                    .description("Номер телефона пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым. Проверяется на корректность.")),
+            RequestDocumentation.parameterWithName("os")
+                    .description("Используемая система пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым.")),
+            RequestDocumentation.parameterWithName("viaEmail").optional()
+                    .description("Отправлять ли письмо на указанный Email")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не обязательно. По умолчанию true.")),
+            RequestDocumentation.parameterWithName("code").optional()
+                    .description("Код подтверждения для регистрации, который приходит на указанный email")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым."))
+    )
+
+    private val payloadDocumentationRequestFields: RequestFieldsSnippet = PayloadDocumentation.requestFields(
+            PayloadDocumentation.fieldWithPath("email")
+                    .description("Email пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым. Проверяется на корректность.")),
+            PayloadDocumentation.fieldWithPath("password")
+                    .description("Пароль пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым. Минимальная длина 3 символа.")),
+            PayloadDocumentation.fieldWithPath("phone")
+                    .description("Номер телефона пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым. Проверяется на корректность.")),
+            PayloadDocumentation.fieldWithPath("os")
+                    .description("Используемая система пользователя")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым.")),
+            PayloadDocumentation.fieldWithPath("viaEmail").optional()
+                    .description("Отправлять ли письмо на указанный Email")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не обязательно. По умолчанию true.")),
+            PayloadDocumentation.fieldWithPath("code").optional()
+                    .description("Код подтверждения для регистрации, который приходит на указанный email")
+                    .attributes(
+                            key("constraints")
+                                    .value("Не должно быть пустым."))
+    )
+
     // Выполняет код перед каждым тестом
     /*@Before
-        public void init() {
-            rolesRepository.save(new RoleName("ROLE_ADMIN"));
-        }*/
+    fun init() {}*/
+
     // Тест GET метода для получения кода подтверждения регистрации
     @Test
     @Order(1)
@@ -78,18 +145,7 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.secondsUntilResend", Matchers.isA<Any>(Int::class.java)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
                 .andDo(MockMvcRestDocumentation.document("{method-name}",
-                        RequestDocumentation.requestParameters(
-                            RequestDocumentation.parameterWithName("email")
-                                    .description("Email пользователя"),
-                            RequestDocumentation.parameterWithName("password")
-                                    .description("Пароль пользователя"),
-                            RequestDocumentation.parameterWithName("phone")
-                                    .description("Номер телефона пользователя"),
-                            RequestDocumentation.parameterWithName("os")
-                                    .description("Используемая система пользователя"),
-                            RequestDocumentation.parameterWithName("viaEmail")
-                                    .description("Отправлять ли письмо на указанный Email").optional()
-                        ),
+                        requestDocumentationParameters,
                         PayloadDocumentation.responseFields(
                             PayloadDocumentation.fieldWithPath("error")
                                     .description("Содержит код ошибки"),
@@ -124,13 +180,14 @@ class RegistrationControllerTest (
         userLoginForm.os = "android"
         userLoginForm.isViaEmail = false
 
-        val fields = ConstrainedFields(UserLoginForm::class.java)
+        //val fields = ConstrainedFields(UserLoginForm::class.java)
 
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-start")
                 .content(objectMapper.writeValueAsString(userLoginForm))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
         )
                 .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
@@ -139,19 +196,7 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.attempts", Matchers.isA<Any>(Int::class.java)))
                 .andDo(MockMvcRestDocumentation.document("{method-name}",
                         // PayloadDocumentation.fieldWithPath
-                        PayloadDocumentation.requestFields(
-                                fields.withPath("email")
-                                        .description("Email пользователя"),
-                                fields.withPath("password")
-                                        .description("Пароль пользователя"),
-                                fields.withPath("phone")
-                                        .description("Номер телефона пользователя"),
-                                fields.withPath("os")
-                                        .description("Используемая система пользователя"),
-                                fields.withPath("viaEmail")
-                                        .description("Отправлять ли письмо на указанный Email").optional(),
-                                fields.withPath("code").ignored()
-                        ),
+                        payloadDocumentationRequestFields,
                         PayloadDocumentation.responseFields(
                                 PayloadDocumentation.fieldWithPath("error")
                                         .description("Содержит код ошибки"),
@@ -173,7 +218,7 @@ class RegistrationControllerTest (
         //verify(verificationCodeRepository, times(1)).save(any(VerificationCode.class));
     }
 
-    // Тест GET метода для регистрации пользователя и получения Session_id
+    // Тест GET метода для регистрации пользователя и получения api-key
     @Test
     @Order(2)
     @Throws(Exception::class)
@@ -186,11 +231,12 @@ class RegistrationControllerTest (
         mockUser.os = "android"
         mockUser.isEnabled = true
         mockUser.emailConfirmed = true
+        mockUser.id = 999L
         mockUser.roles.add( Role(RoleName.ROLE_USER) )
 
         // Используем when().thenReturn(), чтобы при попытке сохранить пользователя нам вернули нашего пользователя
         // иначе будут ошибки ( repository.save(user) must not be null )
-        Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
+        //Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
 
         mockMvc.perform(MockMvcRequestBuilders.get("/reg-confirm")
                 .param("email", "user1@test.io")
@@ -205,26 +251,9 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.api-key", Matchers.isA<Any>(String::class.java)))
                 .andDo(MockMvcRestDocumentation.document("{method-name}",
-                        RequestDocumentation.requestParameters(
-                                RequestDocumentation.parameterWithName("email")
-                                        .description("Email пользователя"),
-                                RequestDocumentation.parameterWithName("password")
-                                        .description("Пароль пользователя"),
-                                RequestDocumentation.parameterWithName("phone")
-                                        .description("Номер телефона пользователя"),
-                                RequestDocumentation.parameterWithName("os")
-                                        .description("Используемая система пользователя"),
-                                RequestDocumentation.parameterWithName("viaEmail")
-                                        .description("Отправлять ли письмо на указанный Email").optional(),
-                                RequestDocumentation.parameterWithName("code")
-                                        .description("Код подтверждения для регистрации, который приходит на указанный email")
-                        ),
-                        HeaderDocumentation.responseHeaders(
-                                HeaderDocumentation.headerWithName("Set-Cookie")
-                                        .description("Поле заголовка SESSION с ID авторизованной сессии, используется при последующих запросах")
-                        ),
+                        requestDocumentationParameters,
                         PayloadDocumentation.responseFields(
                                 PayloadDocumentation.fieldWithPath("error")
                                         .description("Содержит код ошибки"),
@@ -232,8 +261,8 @@ class RegistrationControllerTest (
                                         .description("Содержит описание ошибки"),
                                 PayloadDocumentation.subsectionWithPath("data")
                                         .description("Содержит данные запроса"),
-                                PayloadDocumentation.fieldWithPath("data['session_id']")
-                                        .description("Содержит session_id, которую нужно сохранить, т.к. сессия будет хранится долго")
+                                PayloadDocumentation.fieldWithPath("data['api-key']")
+                                        .description("Содержит api-key, который нужно хранить надёжно. Действителен 3 дня.")
                         )
                 ))
 
@@ -241,7 +270,7 @@ class RegistrationControllerTest (
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
     }
 
-    // Тест POST метода для регистрации пользователя и получения Session_id
+    // Тест POST метода для регистрации пользователя и получения api-key
     @Test
     @Order(4)
     @Throws(Exception::class)
@@ -267,7 +296,7 @@ class RegistrationControllerTest (
         mockUser.roles.add( Role(RoleName.ROLE_USER) )
 
         // Устанавливаем ловушку для возврата нашего пользователя
-        Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
+        //Mockito.`when`( userRepository?.save( ArgumentMatchers.any(User::class.java) ) ).thenReturn(mockUser)
 
         mockMvc.perform(MockMvcRequestBuilders.post("/reg-confirm")
                 .content(objectMapper.writeValueAsString(mockUserLoginForm))
@@ -278,22 +307,9 @@ class RegistrationControllerTest (
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.session_id", Matchers.isA<Any>(String::class.java)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.api-key", Matchers.isA<Any>(String::class.java)))
                 .andDo(MockMvcRestDocumentation.document("{method-name}",
-                        PayloadDocumentation.requestFields(
-                                PayloadDocumentation.fieldWithPath("email")
-                                        .description("Email пользователя"),
-                                PayloadDocumentation.fieldWithPath("password")
-                                        .description("Пароль пользователя"),
-                                PayloadDocumentation.fieldWithPath("phone")
-                                        .description("Номер телефона пользователя"),
-                                PayloadDocumentation.fieldWithPath("os")
-                                        .description("Используемая система пользователя"),
-                                PayloadDocumentation.fieldWithPath("viaEmail")
-                                        .description("Отправлять ли письмо на указанный Email").optional(),
-                                PayloadDocumentation.fieldWithPath("code")
-                                        .description("Код подтверждения для регистрации, который приходит на указанный email")
-                        ),
+                        payloadDocumentationRequestFields,
                         PayloadDocumentation.responseFields(
                                 PayloadDocumentation.fieldWithPath("error")
                                         .description("Содержит код ошибки"),
@@ -301,11 +317,10 @@ class RegistrationControllerTest (
                                         .description("Содержит описание ошибки"),
                                 PayloadDocumentation.subsectionWithPath("data")
                                         .description("Содержит данные запроса"),
-                                PayloadDocumentation.fieldWithPath("data['session_id']")
-                                        .description("Содержит session_id, которую нужно сохранить, т.к. сессия будет хранится долго")
+                                PayloadDocumentation.fieldWithPath("data['api-key']")
+                                        .description("Содержит api-key, который нужно хранить надёжно. Действителен 3 дня.")
                         )
                 ))
-
 
         //Mockito.verify(userRepository, VerificationModeFactory.times(1))!!.save(ArgumentMatchers.any(User::class.java))
         //verify(verificationCodeRepository, times(1)).delete(any(VerificationCode.class));
@@ -324,7 +339,7 @@ class RegistrationControllerTest (
 
     }*/
 
-    private class ConstrainedFields (input: Class<*>) {
+    /*private class ConstrainedFields (input: Class<*>) {
 
         val constraintDescriptions: ConstraintDescriptions = ConstraintDescriptions(input)
 
@@ -340,7 +355,7 @@ class RegistrationControllerTest (
                     )
         }
 
-    }
+    }*/
 
 
 }

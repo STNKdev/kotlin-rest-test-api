@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.scheduling.annotation.EnableAsync
-import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.socket.client.WebSocketConnectionManager
 import org.springframework.web.socket.client.standard.StandardWebSocketClient
 import ru.stnk.resttestapi.entity.Role
@@ -21,7 +20,6 @@ import ru.stnk.resttestapi.service.SimpleWsHandler
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableAsync
-@EnableScheduling
 class RestTestAPIApplication {
 
     private val logger: Logger = LoggerFactory.getLogger(RestTestAPIApplication::class.java)
@@ -38,7 +36,7 @@ class RestTestAPIApplication {
                 rolesRepository.save(Role(RoleName.ROLE_USER))
             }
 
-            if (userRepository.findByEmail("admin@test.io").isPresent) {
+            if (!userRepository.existsByEmail("admin@test.io")) {
                 logger.debug("Добавление Админа")
                 val admin = User()
                 admin.email = "admin@test.io"
