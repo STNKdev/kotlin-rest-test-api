@@ -29,6 +29,11 @@ class LoginControllerTest (
         @Autowired val mockMvc: MockMvc
 ) {
 
+    /*
+    * Ошибка 105 при авторизации - Не правильный логин или пароль
+    *
+    * */
+
     private val objectMapper = ObjectMapper()
 
     @Test
@@ -40,7 +45,8 @@ class LoginControllerTest (
 
         //val fields = ConstrainedFields(LoginForm::class.java)
 
-        val res = mockMvc.perform(MockMvcRequestBuilders.post("/login")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/login")
+                .contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginFormPayload))
         )
@@ -71,41 +77,83 @@ class LoginControllerTest (
                                 PayloadDocumentation.fieldWithPath("data['api-key']")
                                         .description("Содержит api-key, который нужно вставлять в заголовок '-X-api-key' при последующих запросах.")
                         )
-                )).andReturn()
+                ))
+    }
+
+
+    @Test
+    @Throws(Exception::class)
+    fun userInfo() {
+        val loginFormPayload = LoginForm()
+        loginFormPayload.email = "admin@test.io"
+        loginFormPayload.password = "123"
+
+        val res = mockMvc.perform(MockMvcRequestBuilders.post("/api/login")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginFormPayload))
+        )
+                //.andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.api-key").value(Matchers.isA<Any>(String::class.java)))
+                .andReturn()
+
         val apiKey: String? = objectMapper.readTree( res.response.contentAsString ).get("data").get("api-key").asText()
 
-        if (!apiKey.isNullOrBlank()) {
-            mockMvc.perform(MockMvcRequestBuilders.get("/userinfo")
-                    .header("-X-api-key", apiKey)
-            )
-                    .andDo(MockMvcResultHandlers.print())
-                    .andExpect(MockMvcResultMatchers.status().isOk)
-                    .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists())
-                    .andDo(MockMvcRestDocumentation.document("{method-name}",
-                            HeaderDocumentation.requestHeaders(
-                                    HeaderDocumentation.headerWithName("-X-api-key")
-                                            .description("Содержит уникальный ключ для аутентификации запросов")
-                            ),
-                            PayloadDocumentation.responseFields(
-                                    PayloadDocumentation.fieldWithPath("error").ignored(),
-                                    PayloadDocumentation.fieldWithPath("description").ignored(),
-                                    PayloadDocumentation.subsectionWithPath("data")
-                                            .description("Содержит данные запроса"),
-                                    PayloadDocumentation.fieldWithPath("data['email']")
-                                            .description("Email пользователя"),
-                                    PayloadDocumentation.fieldWithPath("data['phone']")
-                                            .description("Номер телефона пользователя"),
-                                    PayloadDocumentation.fieldWithPath("data['emailConfirmed']")
-                                            .description("Подтвержден ли Email пользователя"),
-                                    PayloadDocumentation.fieldWithPath("data['freeBalance']")
-                                            .description("Баланс пользователя"),
-                                    PayloadDocumentation.fieldWithPath("data['betBalance']")
-                                            .description("Баланс пользователя"),
-                                    PayloadDocumentation.fieldWithPath("data['withdrawalBalance']")
-                                            .description("Баланс пользователя")
-                            )
-                    ))
-        }
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/userinfo")
+                .contextPath("/api")
+                .header("-X-api-key", apiKey)
+        )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists())
+                .andDo(MockMvcRestDocumentation.document("{method-name}",
+                        HeaderDocumentation.requestHeaders(
+                                HeaderDocumentation.headerWithName("-X-api-key")
+                                        .description("Содержит уникальный ключ для аутентификации запросов")
+                        ),
+                        PayloadDocumentation.responseFields(
+                                PayloadDocumentation.fieldWithPath("error").ignored(),
+                                PayloadDocumentation.fieldWithPath("description").ignored(),
+                                PayloadDocumentation.subsectionWithPath("data")
+                                        .description("Содержит данные запроса"),
+                                PayloadDocumentation.fieldWithPath("data['email']")
+                                        .description("Email пользователя"),
+                                PayloadDocumentation.fieldWithPath("data['phone']")
+                                        .description("Номер телефона пользователя"),
+                                PayloadDocumentation.fieldWithPath("data['emailConfirmed']")
+                                        .description("Подтвержден ли Email пользователя"),
+                                PayloadDocumentation.fieldWithPath("data['freeBalance']")
+                                        .description("Баланс пользователя"),
+                                PayloadDocumentation.fieldWithPath("data['betBalance']")
+                                        .description("Баланс, участвующий в ставках"),
+                                PayloadDocumentation.fieldWithPath("data['withdrawalBalance']")
+                                        .description("Баланс средств на вывод")
+                        )
+                ))
+
+    }
+
+    // Проверка на ошибку 105
+    @Test
+    @Throws(Exception::class)
+    fun badCredentialsError() {
+        val loginFormPayload = LoginForm()
+        loginFormPayload.email = "user777@test.io"
+        loginFormPayload.password = "123456"
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/login")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginFormPayload))
+        )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(105)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Не правильный логин или пароль")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").doesNotExist())
+                .andDo(MockMvcRestDocumentation.document("{method-name}"))
+
     }
 
 

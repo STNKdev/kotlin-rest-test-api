@@ -56,13 +56,13 @@ class RegistrationControllerServiceTest {
         mockUser.phone = "88002000900"
         mockUser.password = "12345"
 
-        `when`(userRepository?.findByEmail("user@test.io")).thenReturn(Optional.of(mockUser))
-        val isUserExist = registrationControllerService?.userExists(mockUser.email)
+        `when`(userRepository?.existsByEmail("user@test.io")).thenReturn(true)
+        val isUserExist: Boolean? = registrationControllerService?.userExists(mockUser.email)
 
         assertNotNull(isUserExist)
         assertTrue(isUserExist)
 
-        verify(userRepository, times(1))?.findByEmail(mockUser.email)
+        verify(userRepository, times(1))?.existsByEmail(mockUser.email)
     }
 
     @Test

@@ -57,7 +57,8 @@ class RegistrationControllerErrorTest (
     @Test
     @Throws(Exception::class)
     fun notCorrectEmailError() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/reg-start")
+                .contextPath("/api")
                 .param("email", "user1_test.io")
                 .param("password", "123")
                 .param("phone", "88002000601")
@@ -79,7 +80,8 @@ class RegistrationControllerErrorTest (
     @Test
     @Throws(Exception::class)
     fun equalLoginPasswordError() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/reg-start")
+                .contextPath("/api")
                 .param("email", "user1@test.io")
                 .param("password", "user1@test.io")
                 .param("phone", "88002000601")
@@ -101,7 +103,8 @@ class RegistrationControllerErrorTest (
     @Test
     @Throws(Exception::class)
     fun checkNumberPhoneError() {
-        mockMvc.perform(MockMvcRequestBuilders.get("/reg-start")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/reg-start")
+                .contextPath("/api")
                 .param("email", "user1@test.io")
                 .param("password", "123")
                 .param("phone", "+8(495) 302-66-88")
@@ -134,7 +137,8 @@ class RegistrationControllerErrorTest (
         Mockito.`when`( verificationCodeRepository?.findByUserEmail(userEmail) ).thenReturn( Optional.of(verificationCode) )
         //Mockito.`when`( verificationCodeRepository?.save( ArgumentMatchers.any(VerificationCode::class.java) ) ).thenReturn(verificationCode)
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/reg-confirm")
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/reg-confirm")
+                .contextPath("/api")
                 .param("email", userEmail)
                 .param("password", "123")
                 .param("phone", "88002000600")
@@ -155,5 +159,59 @@ class RegistrationControllerErrorTest (
         Mockito.verify(verificationCodeRepository, Mockito.times(1))?.findByUserEmail(userEmail)
         Mockito.verify(verificationCodeRepository, Mockito.times(0))?.save(verificationCode)
 
+    }
+
+    // Проверка на повторный запрос кода подтверждения
+    @Test
+    @Throws(Exception::class)
+    fun delayConfirmCode() {
+        val userEmail = "user777@test.io"
+
+        val verificationCode = VerificationCode(1234,
+                userEmail,
+                60,
+                Instant.now().plusSeconds(300))
+
+        Mockito.`when`( verificationCodeRepository?.findByUserEmail(userEmail) ).thenReturn( Optional.of(verificationCode) )
+        //Mockito.`when`( verificationCodeRepository?.save( ArgumentMatchers.any(VerificationCode::class.java) ) ).thenReturn(verificationCode)
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/reg-start")
+                .contextPath("/api")
+                .param("email", userEmail)
+                .param("password", "123")
+                .param("phone", "88002000600")
+                .param("os", "android")
+                .param("viaEmail", "false")
+        )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists())
+
+        Mockito.verify(verificationCodeRepository, Mockito.times(1))?.findByUserEmail(userEmail)
+        Mockito.verify(verificationCodeRepository, Mockito.times(0))?.save(verificationCode)
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/reg-start")
+                .contextPath("/api")
+                .param("email", userEmail)
+                .param("password", "123")
+                .param("phone", "88002000600")
+                .param("os", "android")
+                .param("viaEmail", "false")
+        )
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.error", Matchers.`is`(112)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.`is`("Слишком рано был запрошен повторный вызов кода подтверждения")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists())
+                .andDo(MockMvcRestDocumentation.document("{method-name}",
+                        PayloadDocumentation.responseFields(description).and(
+                                PayloadDocumentation.fieldWithPath("data['secondsUntilResend']")
+                                        .description("Время через которое можно повторно запросить код подтверждения")
+                        )
+                ))
     }
 }

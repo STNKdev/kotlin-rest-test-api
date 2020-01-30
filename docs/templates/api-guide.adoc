@@ -1,9 +1,252 @@
-= Инструкция по применению API
+= Инструкция по API
+Aleksandr Sytnik;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:toc-title: API
+:operation-curl-request-title: Пример запроса
+:operation-http-response-title: Пример ответа
 
-[[example_curl_request]]
-== Curl request
-include::{snippets}/registration-controller-test/pre-registration-get-method-test/http-request.adoc[]
+[[overview]]
+= Краткий обзор
 
-and
+[[overview-http-verbs]]
+== HTTP методы
 
-include::{snippets}/registration-controller-test/pre-registration-get-method-test/request-parameters.adoc[]
+В нашем API используются `GET` запросы, если не указано иначе.
+
+|===
+| Метод | использование
+
+| `GET`
+| Используется для всех основных запросов
+
+| `POST`
+| Используется при авторизации пользователя, так же как дополнительный метод при регистрации
+|===
+
+[[overview-http-status-codes]]
+== HTTP коды состояния
+
+В нашем API используется в основном код состояния `200 OK`.
+
+|===
+| Код состояния | Использование
+
+| `200 OK`
+| Запрос успешно выполнен
+
+| `401 Unauthorized`
+| Необходима авторизация
+
+| `403 Forbidden`
+| Доступ к ресурсу запрещён, необходима авторизация
+
+| `500 Internal Server Error`
+| Что-то пошло не так
+|===
+
+[[overview-headers]]
+== Заголовки
+
+Каждый ответ содержит следующие заголовоки:
+
+include::{snippets}/pre-registration-get-method/http-response.adoc[]
+
+[[overview-errors]]
+== Ошибки
+
+Если при запросах будут возникать ошибки, то в ответном JSON объекте в ключе
+`'error'` будет код ошибки и в ключе `'description'` ёё описание:
+
+include::{snippets}/equal-login-password-error/response-fields.adoc[]
+
+Например, запрос при регистрации с некоррекным email :
+
+include::{snippets}/not-correct-email-error/response-body.adoc[]
+
+[[overview-response]]
+== Ответы
+
+Ответы от сервера приходят в формате `application/json`:
+
+include::{snippets}/pre-registration-get-method/response-body.adoc[]
+
+include::{snippets}/response-empty-example/response-fields.adoc[]
+
+
+[[resources]]
+= API
+
+[[resources-start-reg]]
+== Начало регистрации
+
+Регистрация пользователя начинается с запроса на адрес `/api/reg-start`.
+Поля в запросе для методов `GET` и `POST` одинаковые.
+В итоге генерируется проверочный код, который приходит на указанный email.
+Для завершения регистрации нужно вызвать следующий метод.
+Описания ниже.
+
+[[resources-start-reg-request-get]]
+=== GET запрос регистрации
+
+При регистрации методом `GET` нужно сформировать URL, содержащий следующие поля:
+
+include::{snippets}/pre-registration-get-method/request-parameters.adoc[]
+
+Пример `GET` запроса регистрации нового пользователя
+
+include::{snippets}/pre-registration-get-method/curl-request.adoc[]
+
+Если все поля были заполнены верно, то ответом будет следующее:
+
+include::{snippets}/pre-registration-get-method/http-response.adoc[]
+
+[[resources-start-reg-request-post]]
+=== POST запрос регистрации
+
+При регистрации методом `POST` нужно сформировать Payload
+с `'Content-Type: application/json;charset=UTF-8'`, содержащий следующие ключи:
+
+include::{snippets}/pre-registration-post-method/request-fields.adoc[]
+
+Пример `POST` запроса регистрации нового пользователя
+
+include::{snippets}/pre-registration-post-method/curl-request.adoc[]
+
+Если все поля были заполнены верно, то ответом будет следующее:
+
+include::{snippets}/pre-registration-post-method/http-response.adoc[]
+
+[[resources-start-reg-response]]
+=== Ответ сервера при запросе регистрации
+
+Ответ сервера при успешном запросе регистрации методом `GET` и `POST` одинаковы:
+include::{snippets}/pre-registration-get-method/response-body.adoc[]
+
+include::{snippets}/pre-registration-post-method/response-fields.adoc[]
+
+[[resources-confirm-reg]]
+== Подтверждение регистрации
+
+Для подтверждения регистрации пользователя нужно сделать запрос
+на адрес `/api/reg-confirm`.
+Поля в запросе для методов `GET` и `POST` такие же как и при старте регистрации,
+только добавляется поле `code`.
+Отправка полученного кода на сервер. Если всё успешно, клиент будет зарегистрирован,
+иначе спишется 1 попытка. При исчерпании попыток будет создан новый код и выслан на указанный email.
+Описания ниже.
+
+[[resources-confirm-reg-request-get]]
+=== GET подтверждение регистрации
+
+Для подтверждения регистрации нужно сформировать URL с теми же полями
+что и при старте регистрации, добавляется только проверочный код:
+
+include::{snippets}/pre-registration-get-method/request-parameters.adoc[]
+
+Пример `GET` запроса подтверждения регистрации нового пользователя
+
+include::{snippets}/registration-confirm-get-method/curl-request.adoc[]
+
+Если все поля были заполнены верно, то ответом будет поле `"api-key"`:
+
+include::{snippets}/registration-confirm-get-method/http-response.adoc[]
+
+[[resources-confirm-reg-request-post]]
+=== POST подтверждение регистрации
+
+Для подтверждения регистрации нужно сформировать Payload
+ `'Content-Type: application/json;charset=UTF-8'`
+с теми же ключами что и при старте регистрации,
+добавляется только проверочный код:
+
+include::{snippets}/registration-confirm-post-method/request-fields.adoc[]
+
+Пример `POST` запроса регистрации нового пользователя
+
+include::{snippets}/registration-confirm-post-method/curl-request.adoc[]
+
+Если все поля были заполнены верно, то ответом будет следующее:
+
+include::{snippets}/registration-confirm-post-method/http-response.adoc[]
+
+[[resources-confirm-reg-response]]
+=== Ответ сервера при подтверждении регистрации
+
+Ответ сервера при успешном подтверждении регистрации
+методом `GET` и `POST` одинаковы:
+
+include::{snippets}/registration-confirm-get-method/response-body.adoc[]
+
+include::{snippets}/registration-confirm-post-method/response-fields.adoc[]
+
+[[resources-errors-reg]]
+== Ошибки при регистрации
+
+При регистрации пользователя могут возникнуть следующие ошибки
+с HTTP кодом ответа `200 OK`:
+
+* 106 - Пользователь существует (привязка на email адрес)
+include::{snippets}/user-exist-error/response-body.adoc[]
+
+* 107 - Некорректный email
+include::{snippets}/not-correct-email-error/response-body.adoc[]
+
+* 108 - Пароль не должен совпадать с логином
+include::{snippets}/equal-login-password-error/response-body.adoc[]
+
+* 111 - Некорректный номер телефона (проверяется regExp выражением)
+include::{snippets}/check-number-phone-error/response-body.adoc[]
+
+* 112 - Слишком рано был запрошен повторный вызов кода подтверждения
+include::{snippets}/delay-confirm-code/response-body.adoc[]
+include::{snippets}/delay-confirm-code/response-fields.adoc[]
+
+[[resiurces-login]]
+== Авторизация
+
+Для авторизации нужно отправить `POST` запрос на `/api/login`
+c Payload в `'Content-Type: application/json;charset=UTF-8'`
+со следующими полями:
+
+include::{snippets}/authenticate-user-test/request-fields.adoc[]
+
+=== Пример запроса
+include::{snippets}/authenticate-user-test/curl-request.adoc[]
+
+В случае успешной авторизации ответом будет `api-key`:
+include::{snippets}/authenticate-user-test/response-body.adoc[]
+
+include::{snippets}/authenticate-user-test/response-fields.adoc[]
+
+Его нужно включать как заголовок `-X-api-key` при последующих запросах.
+
+=== Ошибки авторизации
+
+Если были отправлены неверные данные, то вернется ошибка с описанием.
+
+Или ошибка `105` при неверных данных для авторизации.
+
+include::{snippets}/bad-credentials-error/response-body.adoc[]
+
+[[resources-user-info]]
+== Информация о пользователе
+
+Чтобы получить информацию о пользователе,
+нужно вызвать `/api/userinfo` методом `GET` с обязательным заголовком `-X-api-key`:
+
+include::{snippets}/user-info/curl-request.adoc[]
+
+include::{snippets}/user-info/http-request.adoc[]
+
+Ответ будет содержать следующие поля:
+
+include::{snippets}/user-info/response-fields.adoc[]
+
+=== Пример ответа
+
+include::{snippets}/user-info/response-body.adoc[]

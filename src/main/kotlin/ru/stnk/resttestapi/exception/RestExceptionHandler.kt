@@ -30,14 +30,14 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(BadCredentialsException::class)
     fun handleBadCredentialsException(ex: BadCredentialsException,
                                       request: WebRequest): ResponseEntity<Any> {
-        val restResponse = RestResponse(105, "Не правильный логин или пароль.")
+        val restResponse = RestResponse(105, "Не правильный логин или пароль")
         return ResponseEntity(restResponse, HttpStatus.OK)
     }
 
     @ExceptionHandler(AccessDeniedException::class)
     fun handleAccessDeniedException(ex: AccessDeniedException,
                                     request: WebRequest): ResponseEntity<Any> {
-        val restResponse = RestResponse(HttpStatus.FORBIDDEN.value(), "Доступ запрещен, необходима аутентификация")
+        val restResponse = RestResponse(HttpStatus.FORBIDDEN.value(), "Доступ запрещен, необходима авторизация")
         return ResponseEntity(restResponse, HttpStatus.FORBIDDEN)
     }
 

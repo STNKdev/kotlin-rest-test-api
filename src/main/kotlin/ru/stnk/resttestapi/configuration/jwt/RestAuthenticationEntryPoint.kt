@@ -26,7 +26,7 @@ class RestAuthenticationEntryPoint : AuthenticationEntryPoint {
         response.contentType = "application/json; charset=UTF-8"
 
         val restResponse = RestResponse(401,
-                "Необходима аутентификация.")
+                "Необходима авторизация.")
 
         try {
             logger.error("Unauthorized error. Message - {}", authException.message)
