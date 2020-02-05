@@ -250,3 +250,27 @@ include::{snippets}/user-info/response-fields.adoc[]
 === Пример ответа
 
 include::{snippets}/user-info/response-body.adoc[]
+
+[[resources-coins]]
+== Информация о валютных парах
+
+Чтобы получить информацию о валютных парах,
+нужно вызвать `/api/userinfo` методом `GET`
+
+include::{snippets}/get-coins/curl-request.adoc[]
+
+include::{snippets}/get-coins/http-request.adoc[]
+
+Отсюда можно узнать какие валютные пары доступны и
+основную актуальную информацию по ним.
+
+Ответ будет содержать следующие поля:
+
+include::{snippets}/get-coins/response-fields.adoc[]
+
+=== Пример ответа
+
+include::{snippets}/get-coins/response-body.adoc[]
+
+
+

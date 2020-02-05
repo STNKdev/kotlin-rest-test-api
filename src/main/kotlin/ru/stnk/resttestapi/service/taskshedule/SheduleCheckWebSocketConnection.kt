@@ -1,5 +1,6 @@
 package ru.stnk.resttestapi.service.taskshedule
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -13,7 +14,7 @@ class SheduleCheckWebSocketConnection (
         @Autowired val wsConnectionManager: WebSocketConnectionManager
 ) {
 
-    val logger = LoggerFactory.getLogger(SheduleCheckWebSocketConnection::class.java)
+    val logger: Logger = LoggerFactory.getLogger(SheduleCheckWebSocketConnection::class.java)
 
     @Scheduled(fixedDelay = 60000)
     fun checkConnection () {
