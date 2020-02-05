@@ -255,7 +255,7 @@ include::{snippets}/user-info/response-body.adoc[]
 == Информация о валютных парах
 
 Чтобы получить информацию о валютных парах,
-нужно вызвать `/api/userinfo` методом `GET`
+нужно вызвать `/api/coins` методом `GET`
 
 include::{snippets}/get-coins/curl-request.adoc[]
 
@@ -272,5 +272,55 @@ include::{snippets}/get-coins/response-fields.adoc[]
 
 include::{snippets}/get-coins/response-body.adoc[]
 
+[[resources-coins-candles-one]]
+== Информация о валютных парах в минутных свечах
+
+Чтобы получить информацию о валютных парах,
+нужно вызвать `/api/candles-one` методом `GET`
+
+include::{snippets}/get-candles-one/curl-request.adoc[]
+
+include::{snippets}/get-candles-one/http-request.adoc[]
+
+В запросе так же присутствует параметр:
+
+include::{snippets}/get-candles-one/request-parameters.adoc[]
+
+Ответ будет содержать следующие поля:
+
+include::{snippets}/get-candles-one/response-fields.adoc[]
+
+=== Пример ответа без параметра
+include::{snippets}/get-candles-one/response-body.adoc[]
+
+=== Пример запроса с параметром
+include::{snippets}/get-candles-one-with-param/curl-request.adoc[]
+
+=== Пример ответа с параметром
+include::{snippets}/get-candles-one-with-param/response-body.adoc[]
 
 
+[[resources-coins-candles-five]]
+== Информация о валютных парах в пятиминутных свечах
+
+Чтобы получить информацию о валютных парах,
+нужно вызвать `/api/candles-five` методом `GET`
+
+include::{snippets}/get-candles-five/curl-request.adoc[]
+
+include::{snippets}/get-candles-five/http-request.adoc[]
+
+В запросе так же присутствует параметр:
+include::{snippets}/get-candles-five/request-parameters.adoc[]
+
+Ответ будет содержать следующие поля:
+include::{snippets}/get-candles-five/response-fields.adoc[]
+
+=== Пример ответа без параметра
+include::{snippets}/get-candles-five/response-body.adoc[]
+
+=== Пример запроса с параметром
+include::{snippets}/get-candles-five-with-param/curl-request.adoc[]
+
+=== Пример ответа с параметром
+include::{snippets}/get-candles-five-with-param/response-body.adoc[]

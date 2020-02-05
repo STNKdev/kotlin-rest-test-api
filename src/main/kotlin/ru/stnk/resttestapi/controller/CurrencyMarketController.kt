@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import ru.stnk.resttestapi.entity.coins.InstrumentEntity
+import ru.stnk.resttestapi.entity.coins.QuoteBinOneMinute
 import ru.stnk.resttestapi.repository.InstrumentEntityRepository
 import ru.stnk.resttestapi.repository.QuoteBinFiveMinuteRepository
 import ru.stnk.resttestapi.repository.QuoteBinOneMinuteRepository
@@ -66,45 +67,55 @@ class CurrencyMarketController (
 
     //получить котировки в минутных свечах
     @GetMapping("/candles-one")
-    fun getCandlesOne(@RequestParam(required = false) symbol: String?): ResponseEntity<*> {
+    fun getCandlesOne(@RequestParam(required = false) symbol: String?): RestResponse {
+
+        val restResponse: RestResponse = RestResponse()
 
         // Если параметр symbol не пустой, то возвращаем список котировок определенной валютной пары
         if (symbol != null) {
             if (symbol.equals(xbtUsd, ignoreCase = true)) {
-                val quoteBinOneMinutes = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd)
-                return ResponseEntity(quoteBinOneMinutes, HttpStatus.OK)
+                val quoteBinOneMinutes: List<QuoteBinOneMinute>? = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd)
+                restResponse.data = quoteBinOneMinutes
+                return restResponse
             }
             if (symbol.equals(ethUsd, ignoreCase = true)) {
-                val quoteBinOneMinutes = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(ethUsd)
-                return ResponseEntity(quoteBinOneMinutes, HttpStatus.OK)
+                val quoteBinOneMinutes: List<QuoteBinOneMinute>? = quoteBinOneMinuteRepository.findBySymbolNameOrderByTimestampDesc(ethUsd)
+                restResponse.data = quoteBinOneMinutes
+                return restResponse
             }
         }
 
         // Если параметр symbol пустой, то возвращаем список всех доступных котировок
         val quoteBinOneMinutes = quoteBinOneMinuteRepository.findAll()
-        return ResponseEntity(quoteBinOneMinutes, HttpStatus.OK)
+        restResponse.data = quoteBinOneMinutes
+        return restResponse
 
     }
 
     //получить котировки в пятиминутных свечах
     @GetMapping("/candles-five")
-    fun getCandlesFive(@RequestParam(required = false) symbol: String?): ResponseEntity<*> {
+    fun getCandlesFive(@RequestParam(required = false) symbol: String?): RestResponse {
+
+        val restResponse: RestResponse = RestResponse()
 
         // Если параметр symbol не пустой, то возвращаем список котировок определенной валютной пары
         if (symbol != null) {
             if (symbol.equals(xbtUsd, ignoreCase = true)) {
                 val quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findBySymbolNameOrderByTimestampDesc(xbtUsd)
-                return ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK)
+                restResponse.data = quoteBinFiveMinutes
+                return restResponse
             }
             if (symbol.equals(ethUsd, ignoreCase = true)) {
                 val quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findBySymbolNameOrderByTimestampDesc(ethUsd)
-                return ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK)
+                restResponse.data = quoteBinFiveMinutes
+                return restResponse
             }
         }
 
         // Если параметр symbol пустой, то возвращаем список всех доступных котировок
         val quoteBinFiveMinutes = quoteBinFiveMinuteRepository.findAll()
-        return ResponseEntity(quoteBinFiveMinutes, HttpStatus.OK)
+        restResponse.data = quoteBinFiveMinutes
+        return restResponse
     }
 
     /*private RestTemplate restTemplate = new RestTemplate();

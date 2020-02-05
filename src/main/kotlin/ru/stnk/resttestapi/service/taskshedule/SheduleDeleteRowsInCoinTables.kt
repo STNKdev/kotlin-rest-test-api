@@ -33,7 +33,7 @@ class SheduleDeleteRowsInCoinTables (
 
             logger.debug("Усекаю таблицу quote_bin_one_minute")
 
-            for (i in 0 until oneMinuteList.size - 499) {
+            for (i in 0 until oneMinuteList.size - 999) {
                 try {
                     quoteBinOneMinuteRepository.delete(oneMinuteList[i])
                     logger.debug("Удалил строку $i")

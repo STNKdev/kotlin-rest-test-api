@@ -484,6 +484,25 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_пример_ответа">Пример ответа</a></li>
 </ul>
 </li>
+<li><a href="#resources-coins">Информация о валютных парах</a>
+<ul class="sectlevel2">
+<li><a href="#_пример_ответа_2">Пример ответа</a></li>
+</ul>
+</li>
+<li><a href="#resources-coins-candles-one">Информация о валютных парах в минутных свечах</a>
+<ul class="sectlevel2">
+<li><a href="#_пример_ответа_без_параметра">Пример ответа без параметра</a></li>
+<li><a href="#_пример_запроса_с_параметром">Пример запроса с параметром</a></li>
+<li><a href="#_пример_ответа_с_параметром">Пример ответа с параметром</a></li>
+</ul>
+</li>
+<li><a href="#resources-coins-candles-five">Информация о валютных парах в пятиминутных свечах</a>
+<ul class="sectlevel2">
+<li><a href="#_пример_ответа_без_параметра_2">Пример ответа без параметра</a></li>
+<li><a href="#_пример_запроса_с_параметром_2">Пример запроса с параметром</a></li>
+<li><a href="#_пример_ответа_с_параметром_2">Пример ответа с параметром</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -1447,10 +1466,320 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 </div>
+<div class="sect1 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-255">
+<h2 id="resources-coins"><a class="link" href="#resources-coins">Информация о валютных парах</a></h2>
+<div class="sectionbody">
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-257">
+<p>Чтобы получить информацию о валютных парах,
+нужно вызвать <code>/api/coins</code> методом <code>GET</code></p>
+</div>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-coins/curl-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl 'http://localhost:8080/api/coins' -i -X GET</code></pre>
+</div>
+</div>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-coins/http-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /api/coins HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-264">
+<p>Отсюда можно узнать какие валютные пары доступны и
+основную актуальную информацию по ним.</p>
+</div>
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-267">
+<p>Ответ будет содержать следующие поля:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-coins/response-fields.adoc-1">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Содержит данные запроса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['symbolName']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Краткое имя валютной пары</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['highPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Максимальный прайс</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['lowPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Минимальный прайс</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['lastPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Актуальный прайс</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['bidPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Цена предложения</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['askPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Цена спроса</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-271">
+<h3 id="_пример_ответа_2"><a class="link" href="#_пример_ответа_2">Пример ответа</a></h3>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-coins/response-body.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code>{&quot;data&quot;:[{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;highPrice&quot;:9280.0,&quot;lowPrice&quot;:9080.0,&quot;lastPrice&quot;:9235.0,&quot;bidPrice&quot;:9235.0,&quot;askPrice&quot;:9235.5},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;highPrice&quot;:191.85,&quot;lowPrice&quot;:184.65,&quot;lastPrice&quot;:190.25,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3}],&quot;error&quot;:0,&quot;description&quot;:&quot;&quot;}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-276">
+<h2 id="resources-coins-candles-one"><a class="link" href="#resources-coins-candles-one">Информация о валютных парах в минутных свечах</a></h2>
+<div class="sectionbody">
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-278">
+<p>Чтобы получить информацию о валютных парах,
+нужно вызвать <code>/api/candles-one</code> методом <code>GET</code></p>
+</div>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one/curl-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl 'http://localhost:8080/api/candles-one' -i -X GET</code></pre>
+</div>
+</div>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one/http-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /api/candles-one HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-285">
+<p>В запросе так же присутствует параметр:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one/request-parameters.adoc-1">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Параметры</th>
+<th class="tableblock halign-left valign-top">Описание</th>
+<th class="tableblock halign-left valign-top">Примечание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>symbol</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Краткое имя валютной пары, если не указывать, то в ответе будут записи по всем доступным валютным парам</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Необязательный параметр</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-289">
+<p>Ответ будет содержать следующие поля:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one/response-fields.adoc-1">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Содержит данные запроса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['symbolName']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Краткое имя валютной пары</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['bidPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Цена предложения</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['askPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Цена спроса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['timestamp']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Время обновления</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one/response-body.adoc-0">
+<h3 id="_пример_ответа_без_параметра"><a class="link" href="#_пример_ответа_без_параметра">Пример ответа без параметра</a></h3>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one/response-body.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code>{&quot;data&quot;:[{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.85,&quot;askPrice&quot;:190.9,&quot;timestamp&quot;:&quot;2020-02-05T07:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:16:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.9,&quot;askPrice&quot;:190.95,&quot;timestamp&quot;:&quot;2020-02-05T07:16:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:17:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.9,&quot;askPrice&quot;:190.95,&quot;timestamp&quot;:&quot;2020-02-05T07:17:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:18:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.9,&quot;askPrice&quot;:190.95,&quot;timestamp&quot;:&quot;2020-02-05T07:18:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.0,&quot;timestamp&quot;:&quot;2020-02-05T07:19:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.0,&quot;askPrice&quot;:191.05,&quot;timestamp&quot;:&quot;2020-02-05T07:19:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9262.0,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.1,&quot;askPrice&quot;:191.15,&quot;timestamp&quot;:&quot;2020-02-05T07:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9262.0,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:21:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.15,&quot;askPrice&quot;:191.2,&quot;timestamp&quot;:&quot;2020-02-05T07:21:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9265.5,&quot;askPrice&quot;:9266.0,&quot;timestamp&quot;:&quot;2020-02-05T07:22:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.15,&quot;askPrice&quot;:191.2,&quot;timestamp&quot;:&quot;2020-02-05T07:22:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9267.5,&quot;askPrice&quot;:9268.0,&quot;timestamp&quot;:&quot;2020-02-05T07:23:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.2,&quot;askPrice&quot;:191.25,&quot;timestamp&quot;:&quot;2020-02-05T07:23:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9267.5,&quot;askPrice&quot;:9268.0,&quot;timestamp&quot;:&quot;2020-02-05T07:24:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.2,&quot;askPrice&quot;:191.25,&quot;timestamp&quot;:&quot;2020-02-05T07:24:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9272.0,&quot;askPrice&quot;:9272.5,&quot;timestamp&quot;:&quot;2020-02-05T07:25:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.25,&quot;askPrice&quot;:191.3,&quot;timestamp&quot;:&quot;2020-02-05T07:25:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:26:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.25,&quot;askPrice&quot;:191.3,&quot;timestamp&quot;:&quot;2020-02-05T07:26:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:27:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.25,&quot;askPrice&quot;:191.3,&quot;timestamp&quot;:&quot;2020-02-05T07:27:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:28:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.35,&quot;askPrice&quot;:191.4,&quot;timestamp&quot;:&quot;2020-02-05T07:28:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:29:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.4,&quot;askPrice&quot;:191.45,&quot;timestamp&quot;:&quot;2020-02-05T07:29:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9276.0,&quot;askPrice&quot;:9276.5,&quot;timestamp&quot;:&quot;2020-02-05T07:30:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.4,&quot;askPrice&quot;:191.45,&quot;timestamp&quot;:&quot;2020-02-05T07:30:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9277.5,&quot;askPrice&quot;:9278.0,&quot;timestamp&quot;:&quot;2020-02-05T07:31:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.4,&quot;askPrice&quot;:191.45,&quot;timestamp&quot;:&quot;2020-02-05T07:31:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9272.5,&quot;askPrice&quot;:9273.0,&quot;timestamp&quot;:&quot;2020-02-05T07:32:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.15,&quot;askPrice&quot;:191.2,&quot;timestamp&quot;:&quot;2020-02-05T07:32:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9270.5,&quot;askPrice&quot;:9271.0,&quot;timestamp&quot;:&quot;2020-02-05T07:33:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.0,&quot;askPrice&quot;:191.05,&quot;timestamp&quot;:&quot;2020-02-05T07:33:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9264.5,&quot;askPrice&quot;:9265.0,&quot;timestamp&quot;:&quot;2020-02-05T07:34:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.95,&quot;askPrice&quot;:191.0,&quot;timestamp&quot;:&quot;2020-02-05T07:34:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:35:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.7,&quot;askPrice&quot;:190.75,&quot;timestamp&quot;:&quot;2020-02-05T07:35:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.0,&quot;timestamp&quot;:&quot;2020-02-05T07:36:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.75,&quot;askPrice&quot;:190.8,&quot;timestamp&quot;:&quot;2020-02-05T07:36:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9258.5,&quot;askPrice&quot;:9259.0,&quot;timestamp&quot;:&quot;2020-02-05T07:37:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.7,&quot;askPrice&quot;:190.75,&quot;timestamp&quot;:&quot;2020-02-05T07:37:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:38:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.6,&quot;askPrice&quot;:190.65,&quot;timestamp&quot;:&quot;2020-02-05T07:38:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:39:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.6,&quot;askPrice&quot;:190.65,&quot;timestamp&quot;:&quot;2020-02-05T07:39:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:40:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.75,&quot;askPrice&quot;:190.8,&quot;timestamp&quot;:&quot;2020-02-05T07:40:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:41:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.8,&quot;askPrice&quot;:190.85,&quot;timestamp&quot;:&quot;2020-02-05T07:41:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:42:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.8,&quot;askPrice&quot;:190.85,&quot;timestamp&quot;:&quot;2020-02-05T07:42:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9256.0,&quot;askPrice&quot;:9256.5,&quot;timestamp&quot;:&quot;2020-02-05T07:43:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.8,&quot;askPrice&quot;:190.85,&quot;timestamp&quot;:&quot;2020-02-05T07:43:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9256.0,&quot;askPrice&quot;:9256.5,&quot;timestamp&quot;:&quot;2020-02-05T07:44:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.8,&quot;askPrice&quot;:190.85,&quot;timestamp&quot;:&quot;2020-02-05T07:44:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:45:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.75,&quot;askPrice&quot;:190.8,&quot;timestamp&quot;:&quot;2020-02-05T07:45:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:46:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.75,&quot;askPrice&quot;:190.8,&quot;timestamp&quot;:&quot;2020-02-05T07:46:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.0,&quot;askPrice&quot;:9254.5,&quot;timestamp&quot;:&quot;2020-02-05T07:47:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.7,&quot;askPrice&quot;:190.75,&quot;timestamp&quot;:&quot;2020-02-05T07:47:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:48:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.6,&quot;askPrice&quot;:190.65,&quot;timestamp&quot;:&quot;2020-02-05T07:48:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:49:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.6,&quot;askPrice&quot;:190.65,&quot;timestamp&quot;:&quot;2020-02-05T07:49:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:50:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.6,&quot;askPrice&quot;:190.65,&quot;timestamp&quot;:&quot;2020-02-05T07:50:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:51:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.55,&quot;askPrice&quot;:190.6,&quot;timestamp&quot;:&quot;2020-02-05T07:51:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:52:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.45,&quot;askPrice&quot;:190.5,&quot;timestamp&quot;:&quot;2020-02-05T07:52:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:53:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T07:53:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:54:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T07:54:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:55:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.3,&quot;askPrice&quot;:190.35,&quot;timestamp&quot;:&quot;2020-02-05T07:55:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:56:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.3,&quot;askPrice&quot;:190.35,&quot;timestamp&quot;:&quot;2020-02-05T07:56:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:57:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T07:57:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:58:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T07:58:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:59:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T07:59:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:00:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:00:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:01:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:01:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:02:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.55,&quot;askPrice&quot;:190.6,&quot;timestamp&quot;:&quot;2020-02-05T08:02:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:03:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.55,&quot;askPrice&quot;:190.6,&quot;timestamp&quot;:&quot;2020-02-05T08:03:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9245.5,&quot;askPrice&quot;:9246.0,&quot;timestamp&quot;:&quot;2020-02-05T08:04:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3,&quot;timestamp&quot;:&quot;2020-02-05T08:04:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T08:05:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3,&quot;timestamp&quot;:&quot;2020-02-05T08:05:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9241.5,&quot;askPrice&quot;:9242.0,&quot;timestamp&quot;:&quot;2020-02-05T08:06:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3,&quot;timestamp&quot;:&quot;2020-02-05T08:06:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9240.0,&quot;askPrice&quot;:9240.5,&quot;timestamp&quot;:&quot;2020-02-05T08:07:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.2,&quot;askPrice&quot;:190.25,&quot;timestamp&quot;:&quot;2020-02-05T08:07:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9235.5,&quot;askPrice&quot;:9236.0,&quot;timestamp&quot;:&quot;2020-02-05T08:08:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.15,&quot;askPrice&quot;:190.2,&quot;timestamp&quot;:&quot;2020-02-05T08:08:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9237.5,&quot;askPrice&quot;:9238.0,&quot;timestamp&quot;:&quot;2020-02-05T08:09:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.15,&quot;askPrice&quot;:190.2,&quot;timestamp&quot;:&quot;2020-02-05T08:09:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:10:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3,&quot;timestamp&quot;:&quot;2020-02-05T08:10:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9246.0,&quot;askPrice&quot;:9246.5,&quot;timestamp&quot;:&quot;2020-02-05T08:11:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T08:11:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9245.0,&quot;askPrice&quot;:9245.5,&quot;timestamp&quot;:&quot;2020-02-05T08:12:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T08:12:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:13:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T08:13:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:14:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T08:14:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T08:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:16:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:16:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:17:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:17:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:18:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:18:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:19:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:19:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9240.0,&quot;askPrice&quot;:9240.5,&quot;timestamp&quot;:&quot;2020-02-05T08:21:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.3,&quot;askPrice&quot;:190.35,&quot;timestamp&quot;:&quot;2020-02-05T08:21:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9236.0,&quot;askPrice&quot;:9236.5,&quot;timestamp&quot;:&quot;2020-02-05T08:22:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3,&quot;timestamp&quot;:&quot;2020-02-05T08:22:00.000+0000&quot;}],&quot;error&quot;:0,&quot;description&quot;:&quot;&quot;}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one-with-param/curl-request.adoc-0">
+<h3 id="_пример_запроса_с_параметром"><a class="link" href="#_пример_запроса_с_параметром">Пример запроса с параметром</a></h3>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one-with-param/curl-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl 'http://localhost:8080/api/candles-one?symbol=XBTUSD' -i -X GET</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one-with-param/response-body.adoc-0">
+<h3 id="_пример_ответа_с_параметром"><a class="link" href="#_пример_ответа_с_параметром">Пример ответа с параметром</a></h3>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-one-with-param/response-body.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code>{&quot;data&quot;:[{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9236.0,&quot;askPrice&quot;:9236.5,&quot;timestamp&quot;:&quot;2020-02-05T08:22:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9240.0,&quot;askPrice&quot;:9240.5,&quot;timestamp&quot;:&quot;2020-02-05T08:21:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:19:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:18:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:17:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:16:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:14:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:13:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9245.0,&quot;askPrice&quot;:9245.5,&quot;timestamp&quot;:&quot;2020-02-05T08:12:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9246.0,&quot;askPrice&quot;:9246.5,&quot;timestamp&quot;:&quot;2020-02-05T08:11:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:10:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9237.5,&quot;askPrice&quot;:9238.0,&quot;timestamp&quot;:&quot;2020-02-05T08:09:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9235.5,&quot;askPrice&quot;:9236.0,&quot;timestamp&quot;:&quot;2020-02-05T08:08:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9240.0,&quot;askPrice&quot;:9240.5,&quot;timestamp&quot;:&quot;2020-02-05T08:07:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9241.5,&quot;askPrice&quot;:9242.0,&quot;timestamp&quot;:&quot;2020-02-05T08:06:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T08:05:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9245.5,&quot;askPrice&quot;:9246.0,&quot;timestamp&quot;:&quot;2020-02-05T08:04:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:03:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:02:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:01:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:00:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:59:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:58:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:57:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:56:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:55:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:54:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:53:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:52:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T07:51:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:50:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:49:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:48:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.0,&quot;askPrice&quot;:9254.5,&quot;timestamp&quot;:&quot;2020-02-05T07:47:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:46:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:45:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9256.0,&quot;askPrice&quot;:9256.5,&quot;timestamp&quot;:&quot;2020-02-05T07:44:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9256.0,&quot;askPrice&quot;:9256.5,&quot;timestamp&quot;:&quot;2020-02-05T07:43:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:42:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:41:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:40:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:39:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:38:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9258.5,&quot;askPrice&quot;:9259.0,&quot;timestamp&quot;:&quot;2020-02-05T07:37:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.0,&quot;timestamp&quot;:&quot;2020-02-05T07:36:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:35:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9264.5,&quot;askPrice&quot;:9265.0,&quot;timestamp&quot;:&quot;2020-02-05T07:34:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9270.5,&quot;askPrice&quot;:9271.0,&quot;timestamp&quot;:&quot;2020-02-05T07:33:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9272.5,&quot;askPrice&quot;:9273.0,&quot;timestamp&quot;:&quot;2020-02-05T07:32:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9277.5,&quot;askPrice&quot;:9278.0,&quot;timestamp&quot;:&quot;2020-02-05T07:31:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9276.0,&quot;askPrice&quot;:9276.5,&quot;timestamp&quot;:&quot;2020-02-05T07:30:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:29:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:28:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:27:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9273.0,&quot;askPrice&quot;:9273.5,&quot;timestamp&quot;:&quot;2020-02-05T07:26:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9272.0,&quot;askPrice&quot;:9272.5,&quot;timestamp&quot;:&quot;2020-02-05T07:25:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9267.5,&quot;askPrice&quot;:9268.0,&quot;timestamp&quot;:&quot;2020-02-05T07:24:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9267.5,&quot;askPrice&quot;:9268.0,&quot;timestamp&quot;:&quot;2020-02-05T07:23:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9265.5,&quot;askPrice&quot;:9266.0,&quot;timestamp&quot;:&quot;2020-02-05T07:22:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9262.0,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:21:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9262.0,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.0,&quot;timestamp&quot;:&quot;2020-02-05T07:19:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:18:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:17:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:16:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:15:00.000+0000&quot;}],&quot;error&quot;:0,&quot;description&quot;:&quot;&quot;}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-304">
+<h2 id="resources-coins-candles-five"><a class="link" href="#resources-coins-candles-five">Информация о валютных парах в пятиминутных свечах</a></h2>
+<div class="sectionbody">
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/docs/templates/api-guide.adoc-306">
+<p>Чтобы получить информацию о валютных парах,
+нужно вызвать <code>/api/candles-five</code> методом <code>GET</code></p>
+</div>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/curl-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl 'http://localhost:8080/api/candles-five' -i -X GET</code></pre>
+</div>
+</div>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/http-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code data-lang="http">GET /api/candles-five HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/request-parameters.adoc-0">
+<p>В запросе так же присутствует параметр:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/request-parameters.adoc-1">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Параметры</th>
+<th class="tableblock halign-left valign-top">Описание</th>
+<th class="tableblock halign-left valign-top">Примечание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>symbol</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Краткое имя валютной пары, если не указывать, то в ответе будут записи по всем доступным валютным парам</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Необязательный параметр</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/response-fields.adoc-0">
+<p>Ответ будет содержать следующие поля:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/response-fields.adoc-1">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Содержит данные запроса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['symbolName']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Краткое имя валютной пары</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['bidPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Цена предложения</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['askPrice']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Цена спроса</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[0]['timestamp']</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Время обновления в формате ISO 8601</p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect2 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/response-body.adoc-0">
+<h3 id="_пример_ответа_без_параметра_2"><a class="link" href="#_пример_ответа_без_параметра_2">Пример ответа без параметра</a></h3>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five/response-body.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code>{&quot;data&quot;:[{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.85,&quot;askPrice&quot;:190.9,&quot;timestamp&quot;:&quot;2020-02-05T07:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9262.0,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.1,&quot;askPrice&quot;:191.15,&quot;timestamp&quot;:&quot;2020-02-05T07:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9272.0,&quot;askPrice&quot;:9272.5,&quot;timestamp&quot;:&quot;2020-02-05T07:25:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.25,&quot;askPrice&quot;:191.3,&quot;timestamp&quot;:&quot;2020-02-05T07:25:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9276.0,&quot;askPrice&quot;:9276.5,&quot;timestamp&quot;:&quot;2020-02-05T07:30:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:191.4,&quot;askPrice&quot;:191.45,&quot;timestamp&quot;:&quot;2020-02-05T07:30:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:35:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.7,&quot;askPrice&quot;:190.75,&quot;timestamp&quot;:&quot;2020-02-05T07:35:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:40:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.75,&quot;askPrice&quot;:190.8,&quot;timestamp&quot;:&quot;2020-02-05T07:40:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:45:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.75,&quot;askPrice&quot;:190.8,&quot;timestamp&quot;:&quot;2020-02-05T07:45:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:50:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.6,&quot;askPrice&quot;:190.65,&quot;timestamp&quot;:&quot;2020-02-05T07:50:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:55:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.3,&quot;askPrice&quot;:190.35,&quot;timestamp&quot;:&quot;2020-02-05T07:55:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:00:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:00:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T08:05:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3,&quot;timestamp&quot;:&quot;2020-02-05T08:05:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:10:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.25,&quot;askPrice&quot;:190.3,&quot;timestamp&quot;:&quot;2020-02-05T08:10:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.35,&quot;askPrice&quot;:190.4,&quot;timestamp&quot;:&quot;2020-02-05T08:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;ETHUSD&quot;,&quot;bidPrice&quot;:190.4,&quot;askPrice&quot;:190.45,&quot;timestamp&quot;:&quot;2020-02-05T08:20:00.000+0000&quot;}],&quot;error&quot;:0,&quot;description&quot;:&quot;&quot;}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five-with-param/curl-request.adoc-0">
+<h3 id="_пример_запроса_с_параметром_2"><a class="link" href="#_пример_запроса_с_параметром_2">Пример запроса с параметром</a></h3>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five-with-param/curl-request.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="bash">$ curl 'http://localhost:8080/api/candles-five?symbol=XBTUSD' -i -X GET</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2 has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five-with-param/response-body.adoc-0">
+<h3 id="_пример_ответа_с_параметром_2"><a class="link" href="#_пример_ответа_с_параметром_2">Пример ответа с параметром</a></h3>
+<div class="listingblock has-source-line data-line-C:/Users/ZakAleksandr/YandexDisk/java-dev/kotlin-rest-test-api/build/generated-snippets/get-candles-five-with-param/response-body.adoc-2">
+<div class="content">
+<pre class="CodeRay highlight nowrap"><code>{&quot;data&quot;:[{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:15:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9242.5,&quot;askPrice&quot;:9243.0,&quot;timestamp&quot;:&quot;2020-02-05T08:10:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T08:05:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9251.0,&quot;askPrice&quot;:9251.5,&quot;timestamp&quot;:&quot;2020-02-05T08:00:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9244.0,&quot;askPrice&quot;:9244.5,&quot;timestamp&quot;:&quot;2020-02-05T07:55:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:50:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9254.5,&quot;askPrice&quot;:9255.0,&quot;timestamp&quot;:&quot;2020-02-05T07:45:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9257.5,&quot;askPrice&quot;:9258.0,&quot;timestamp&quot;:&quot;2020-02-05T07:40:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9261.5,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:35:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9276.0,&quot;askPrice&quot;:9276.5,&quot;timestamp&quot;:&quot;2020-02-05T07:30:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9272.0,&quot;askPrice&quot;:9272.5,&quot;timestamp&quot;:&quot;2020-02-05T07:25:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9262.0,&quot;askPrice&quot;:9262.5,&quot;timestamp&quot;:&quot;2020-02-05T07:20:00.000+0000&quot;},{&quot;symbolName&quot;:&quot;XBTUSD&quot;,&quot;bidPrice&quot;:9253.5,&quot;askPrice&quot;:9254.0,&quot;timestamp&quot;:&quot;2020-02-05T07:15:00.000+0000&quot;}],&quot;error&quot;:0,&quot;description&quot;:&quot;&quot;}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-01-30 15:09:43 +0300
+Last updated 2020-02-05 15:05:09 +0300
 </div>
 </div>
 </body>
